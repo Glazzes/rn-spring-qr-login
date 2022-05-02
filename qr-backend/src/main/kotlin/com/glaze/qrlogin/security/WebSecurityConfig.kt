@@ -1,10 +1,11 @@
 package com.glaze.qrlogin.security
 
-import com.glaze.qrlogin.security.contracts.RedisUserDetailsService
+import com.glaze.qrlogin.security.global.GlobalAuthenticationFilter
+import com.glaze.qrlogin.security.shared.RedisUserDetailsService
+import com.glaze.qrlogin.security.qr.QrAuthenticationFilter
 import com.glaze.qrlogin.security.qr.QrAuthenticationProvider
 import com.glaze.qrlogin.security.userpass.PasswordAuthenticationFilter
 import org.springframework.context.annotation.Bean
-import org.springframework.http.HttpMethod
 import org.springframework.security.authentication.AuthenticationManager
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder
 import org.springframework.security.config.annotation.web.builders.HttpSecurity
@@ -17,8 +18,8 @@ import org.springframework.web.cors.CorsConfiguration
 
 @EnableWebSecurity
 class WebSecurityConfig(
+    private val userDetailsService: RedisUserDetailsService,
     private val qrAuthenticationProvider: QrAuthenticationProvider,
-    private val userDetailsService: RedisUserDetailsService
 ): WebSecurityConfigurerAdapter(){
 
     override fun configure(auth: AuthenticationManagerBuilder) {
@@ -41,15 +42,22 @@ class WebSecurityConfig(
             }}
             .sessionManagement { it.sessionCreationPolicy(SessionCreationPolicy.STATELESS) }
             .authorizeRequests {
-                it.mvcMatchers(
-                    "/api/v1/qrcode", "/api/v1/users/me", "/api/v1/login/qr", "/api/v1/events/*/user-show",
-                    "/api/v1/events/*/login-cancel", "/api/v1/events/*/login-perform"
-                ).authenticated()
-
-                it.antMatchers("/api/v1/users", "/api/v1/login").anonymous()
-                it.anyRequest().denyAll()
+                it.antMatchers(
+                    "/api/v1/qrcode", "/api/v1/users/me", "/api/v1/events/*/user-show",
+                    "/api/v1/events/*/login-cancel", "/api/v1/events/*/login-perform").authenticated()
+                    .antMatchers("/api/v1/login").permitAll()
+                    // .antMatchers("/api/v1/users", "/api/v1/login/qr").anonymous()
+                    .anyRequest().denyAll()
             }
             .addFilter(PasswordAuthenticationFilter(this.authenticationManagerBean()))
+            .addFilterAfter(
+                QrAuthenticationFilter(this.authenticationManagerBean()),
+                PasswordAuthenticationFilter::class.java
+            )
+            .addFilterAfter(
+                GlobalAuthenticationFilter(),
+                QrAuthenticationFilter::class.java
+            )
             .httpBasic { it.disable() }
             .formLogin { it.disable() }
     }

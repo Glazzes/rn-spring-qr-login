@@ -24,6 +24,9 @@ dependencies {
 	implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
 	testImplementation("org.springframework.boot:spring-boot-starter-test")
 	testImplementation("org.springframework.security:spring-security-test")
+	implementation("io.jsonwebtoken:jjwt-api:0.11.3")
+	implementation("io.jsonwebtoken:jjwt-impl:0.11.3")
+	implementation("io.jsonwebtoken:jjwt-jackson:0.11.3")
 }
 
 tasks.withType<KotlinCompile> {

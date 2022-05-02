@@ -1,6 +1,7 @@
 package com.glaze.qrlogin.controller
 
 import com.glaze.qrlogin.service.EventEmitterService
+import com.glaze.qrlogin.service.EventEmitters
 import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
@@ -10,10 +11,12 @@ import java.util.concurrent.ConcurrentHashMap
 
 @RestController
 @RequestMapping("/api/v1/events")
-class EventEmitterController(private val eventEmitterService: EventEmitterService){
+class EventEmitterController(
+    private val eventEmitterService: EventEmitterService,
+    private val eventEmitters: EventEmitters
+){
 
     private val timeout = 1000 * 60 * 5L
-    private val eventEmitters = ConcurrentHashMap<String, SseEmitter>()
 
     @GetMapping(path = ["/{id}/register"], produces = [MediaType.TEXT_EVENT_STREAM_VALUE])
     fun register(@PathVariable id: String) : SseEmitter {
@@ -21,12 +24,14 @@ class EventEmitterController(private val eventEmitterService: EventEmitterServic
         val runnable = Runnable { eventEmitters.remove(id) }
         emitter.onTimeout(runnable)
         emitter.onCompletion(runnable)
+
+        eventEmitters.save(id, emitter)
         return emitter
     }
 
     @PostMapping(path = ["/{id}/user-show"])
     fun sendUserShowEvent(@PathVariable id:String): ResponseEntity<Unit> {
-        val emitter = eventEmitters[id] ?:
+        val emitter = eventEmitters.emitters[id] ?:
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
                 .build()
 
@@ -37,7 +42,7 @@ class EventEmitterController(private val eventEmitterService: EventEmitterServic
 
     @PostMapping(path = ["/{id}/login-cancel"])
     fun sendLoginCancelEvent(@PathVariable id: String): ResponseEntity<Unit> {
-        val emitter = eventEmitters[id] ?:
+        val emitter = eventEmitters.emitters[id] ?:
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
                 .build()
 
@@ -47,7 +52,7 @@ class EventEmitterController(private val eventEmitterService: EventEmitterServic
     }
     @PostMapping(path = ["/{id}/login-perform"])
     fun sendLoginPerformEvent(@PathVariable id: String): ResponseEntity<Unit> {
-        val emitter = eventEmitters[id] ?:
+        val emitter = eventEmitters.emitters[id] ?:
         return ResponseEntity.status(HttpStatus.NOT_FOUND)
             .build()
 
@@ -55,7 +60,6 @@ class EventEmitterController(private val eventEmitterService: EventEmitterServic
         return ResponseEntity.status(HttpStatus.NO_CONTENT)
             .build()
     }
-
 
     @DeleteMapping(path = ["/{id}"])
     fun delete(@PathVariable id: String): ResponseEntity<Unit> {

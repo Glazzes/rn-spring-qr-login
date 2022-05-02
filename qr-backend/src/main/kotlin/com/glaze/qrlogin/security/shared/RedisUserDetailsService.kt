@@ -1,6 +1,7 @@
-package com.glaze.qrlogin.security.contracts
+package com.glaze.qrlogin.security.shared
 
 import com.glaze.qrlogin.repositories.UserRepository
+import com.glaze.qrlogin.security.shared.UserToUserDetailsAdapter
 import org.springframework.security.core.userdetails.UserDetails
 import org.springframework.security.core.userdetails.UserDetailsService
 import org.springframework.security.core.userdetails.UsernameNotFoundException

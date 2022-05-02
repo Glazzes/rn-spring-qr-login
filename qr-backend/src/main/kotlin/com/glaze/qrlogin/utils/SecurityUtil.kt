@@ -1,7 +1,7 @@
 package com.glaze.qrlogin.utils
 
 import com.glaze.qrlogin.entities.User
-import com.glaze.qrlogin.security.contracts.UserToUserDetailsAdapter
+import com.glaze.qrlogin.security.shared.UserToUserDetailsAdapter
 import org.springframework.security.core.context.SecurityContextHolder
 
 object SecurityUtil {
