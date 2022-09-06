@@ -20,4 +20,13 @@ class AuthController(private val authService: AuthService){
             .build()
     }
 
+    /*
+    Spring security used to not complain of "hidden" endpoints, this one is for spring security
+    not to return a 404 status code, as changing it manually has no effect on the response
+     */
+    @PostMapping("/login")
+    fun usernamePasswordLogin(): ResponseEntity<Unit> {
+        return ResponseEntity.noContent().build()
+    }
+
 }

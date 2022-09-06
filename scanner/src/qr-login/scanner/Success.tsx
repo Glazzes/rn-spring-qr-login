@@ -2,22 +2,16 @@ import {View, Dimensions, StyleSheet} from 'react-native';
 import React, {useEffect, useRef} from 'react';
 import AnimatedLottieView from 'lottie-react-native';
 import emitter from '../../utils/emitter';
-import {Navigation} from 'react-native-navigation';
-import {Screens} from '../../utils/screens';
 
 const {width, height} = Dimensions.get('window');
 const SIZE = width * 0.8;
 
-type SuccessProps = {
-  parentId: string;
-};
+type SuccessProps = {};
 
-const Success: React.FC<SuccessProps> = ({parentId}) => {
+const Success: React.FC<SuccessProps> = () => {
   const lottie = useRef<AnimatedLottieView>(null);
 
-  const toHome = () => {
-    Navigation.push(parentId, {component: {name: Screens.DEVICE_FOUND}});
-  };
+  const toHome = () => {};
 
   useEffect(() => {
     emitter.addListener('play.animation', (_: {}) => {

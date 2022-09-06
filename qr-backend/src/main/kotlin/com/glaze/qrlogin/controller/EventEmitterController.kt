@@ -16,7 +16,7 @@ class EventEmitterController(
     private val eventEmitters: EventEmitters
 ){
 
-    private val timeout = 1000 * 60 * 5L
+    private val timeout = 1000 * 60 * 10L
 
     @GetMapping(path = ["/{id}/register"], produces = [MediaType.TEXT_EVENT_STREAM_VALUE])
     fun register(@PathVariable id: String) : SseEmitter {

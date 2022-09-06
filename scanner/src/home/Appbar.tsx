@@ -1,9 +1,10 @@
 import React from 'react';
 import {Avatar, Box, HStack, Text} from 'native-base';
-import {authStore} from '../store';
+import {useSnapshot} from 'valtio';
+import {authState} from '../store/authStore';
 
 const Appbar: React.FC = () => {
-  const user = authStore(state => state.user);
+  const snap = useSnapshot(authState);
 
   return (
     <Box bg={'#fff'}>
@@ -14,11 +15,11 @@ const Appbar: React.FC = () => {
         alignItems={'center'}
         justifyContent={'space-between'}>
         <Text fontSize={'20'} fontWeight={'bold'}>
-          {user.username}
+          {snap.user.username}
         </Text>
         <Avatar
           bg={'amber.500'}
-          source={{uri: user.profilePicture}}
+          source={{uri: snap.user.profilePicture}}
           size={'9'}
         />
       </HStack>

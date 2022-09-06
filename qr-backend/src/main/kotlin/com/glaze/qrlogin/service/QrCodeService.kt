@@ -13,7 +13,7 @@ class QrCodeService(
     private val qrCodeRepository: QrCodeRepository
 ){
 
-    fun save(request: QrCodeLoginRequest) {
+    fun save(request: QrCodeLoginRequest): QrCode {
         val authenticatedUser = SecurityUtil.getAuthenticatedUser()
         if(request.issuedFor != authenticatedUser.id) {
             throw AssociationException("You attempted to issue a token for another user")
@@ -24,7 +24,7 @@ class QrCodeService(
             mobileId = request.mobileId,
             deviceId = request.deviceId)
 
-        qrCodeRepository.save(entity)
+        return qrCodeRepository.save(entity)
     }
 
 }

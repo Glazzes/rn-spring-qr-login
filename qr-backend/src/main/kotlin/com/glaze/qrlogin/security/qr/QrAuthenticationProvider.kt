@@ -25,13 +25,13 @@ class QrAuthenticationProvider(
         }
 
         val principal = userDetailsService.loadUserByUsername(issuedFor) as UserToUserDetailsAdapter
-        val successfulAuthentication= SuccessfulAuthenticationToken(principal)
+        val successfulAuthentication = SuccessfulAuthenticationToken(principal)
         successfulAuthentication.isAuthenticated = true
 
         return successfulAuthentication
     }
 
     override fun supports(authentication: Class<*>): Boolean {
-        return authentication == QrAuthenticationToken::class
+        return authentication == QrAuthenticationToken::class.java
     }
 }

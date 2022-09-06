@@ -1,17 +1,10 @@
 import {Dimensions} from 'react-native';
 import React from 'react';
-import {NavigationFunctionComponent, Navigation} from 'react-native-navigation';
-import {
-  Text,
-  Box,
-  Image,
-  NativeBaseProvider,
-  VStack,
-  Button,
-} from 'native-base';
-import {Screens} from '../../utils/screens';
+import {Text, Box, Image, VStack, Button} from 'native-base';
 import Info from '../utils/Info';
 import {Information} from '../../types/information';
+import {NavigationProp, RouteProp} from '@react-navigation/native';
+import {StackScreens} from '../../navigation/stackScreens';
 
 const {width, height} = Dimensions.get('window');
 const found = require('../../assets/found.png');
@@ -31,74 +24,67 @@ const paths: {[id: string]: Information} = {
   },
 };
 
-const DeviceInformation: NavigationFunctionComponent = ({componentId}) => {
-  const toRoot = () => Navigation.popToRoot(Screens.STACK);
-
-  const toSuccess = () =>
-    Navigation.push(componentId, {
-      component: {
-        name: Screens.POST_SCAN,
-        passProps: {
-          information: paths.notFound,
-        },
-      },
-    });
-
-  return (
-    <NativeBaseProvider>
-      <Box flex={1} py={'4'} bg={'#fff'} alignItems={'center'}>
-        <Image
-          source={found}
-          width={width}
-          height={height / 2}
-          resizeMode={'contain'}
-          alt={'Cat is looking at phone front camera'}
-        />
-        <VStack flex={1} justifyContent={'space-between'} alignItems={'center'}>
-          <VStack>
-            <Text
-              fontSize={'24'}
-              fontWeight={'bold'}
-              color={'#1d1d1d'}
-              mb={'2'}
-              textAlign={'center'}>
-              Your device
-            </Text>
-            <Info text={'Linux, Firefox 99.3'} />
-            <Info text={'IP address 192.168.0.1'} />
-            <Info text={'Manizales, Caldas'} />
-          </VStack>
-          <VStack>
-            <Button
-              bgColor={'#1d1d1d'}
-              textTransform={'uppercase'}
-              mb={'2'}
-              onPress={toSuccess}>
-              Log me in
-            </Button>
-            <Button
-              variant={'outline'}
-              bgColor={'#fff'}
-              borderColor={'#1d1d1d'}
-              color={'#1d1d1d'}
-              textTransform={'uppercase'}
-              onPress={toRoot}>
-              <Info text={'This is not my device'} />
-            </Button>
-          </VStack>
-        </VStack>
-      </Box>
-    </NativeBaseProvider>
-  );
+type DeviceInformationProps = {
+  navigation: NavigationProp<StackScreens, 'DeviceInformation'>;
+  route: RouteProp<StackScreens, 'DeviceInformation'>;
 };
 
-DeviceInformation.options = {
-  statusBar: {
-    visible: false,
-  },
-  hardwareBackButton: {
-    popStackOnPress: false,
-  },
+const DeviceInformation: React.FC<DeviceInformationProps> = ({
+  navigation,
+  route,
+}) => {
+  const popToRoot = () => {
+    navigation.navigate('Home');
+  };
+
+  const toSuccess = () => {
+    navigation.navigate('Success', {information: paths.success});
+  };
+
+  return (
+    <Box flex={1} py={'4'} bg={'#fff'} alignItems={'center'}>
+      <Image
+        source={found}
+        width={width}
+        height={height / 2}
+        resizeMode={'contain'}
+        alt={'Cat is looking at phone front camera'}
+      />
+      <VStack flex={1} justifyContent={'space-between'} alignItems={'center'}>
+        <VStack>
+          <Text
+            fontSize={'24'}
+            fontWeight={'bold'}
+            color={'#1d1d1d'}
+            mb={'2'}
+            textAlign={'center'}>
+            Your device
+          </Text>
+          <Info text={route.params.device} />
+          <Info text={`Ip address ${route.params.ipAddress}`} />
+          <Info text={route.params.location} />
+        </VStack>
+        <VStack>
+          <Button
+            bgColor={'#1d1d1d'}
+            textTransform={'uppercase'}
+            mb={'2'}
+            onPress={toSuccess}>
+            Log me in
+          </Button>
+          <Button
+            variant={'outline'}
+            bgColor={'#fff'}
+            borderColor={'#1d1d1d'}
+            color={'#1d1d1d'}
+            textTransform={'uppercase'}
+            onPress={popToRoot}>
+            <Info text={'This is not my device'} />
+          </Button>
+        </VStack>
+      </VStack>
+    </Box>
+  );
 };
 
 export default DeviceInformation;

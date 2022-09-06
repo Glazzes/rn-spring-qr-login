@@ -1,44 +1,37 @@
 import React from 'react';
-import {Navigation, NavigationFunctionComponent} from 'react-native-navigation';
-import {Button, Center, NativeBaseProvider, View} from 'native-base';
+import {Button, Center, View} from 'native-base';
 import Appbar from './Appbar';
-import {StyleSheet} from 'react-native';
-import useAddComponentId from '../hooks/useAddComponent';
-import {Screens} from '../utils/screens';
+import {StatusBar, StyleSheet} from 'react-native';
+import {NavigationProp} from '@react-navigation/native';
+import {StackScreens} from '../navigation/stackScreens';
 
-const Home: NavigationFunctionComponent = ({componentId}) => {
-  useAddComponentId(Screens.HOME, componentId);
+type HomeProps = {
+  navigation: NavigationProp<StackScreens, 'Home'>;
+};
 
+const Home: React.FC<HomeProps> = ({navigation}) => {
   const toWarning = () => {
-    Navigation.push(componentId, {
-      component: {name: 'Warning'},
-    });
+    navigation.navigate('Warning');
   };
 
   return (
-    <NativeBaseProvider>
-      <View style={styles.root}>
-        <Appbar />
-        <Center flex={1}>
-          <Button
-            bgColor={'#1d1d1d'}
-            rounded={'md'}
-            fontWeight={'bold'}
-            onPress={() => toWarning()}>
-            Login with QR
-          </Button>
-        </Center>
-      </View>
-    </NativeBaseProvider>
+    <View style={styles.root}>
+      <StatusBar
+        backgroundColor={'rgba(0, 0, 0, 0.1)'}
+        barStyle={'light-content'}
+      />
+      <Appbar />
+      <Center flex={1}>
+        <Button
+          bgColor={'#1d1d1d'}
+          rounded={'md'}
+          fontWeight={'bold'}
+          onPress={() => toWarning()}>
+          Login with QR
+        </Button>
+      </Center>
+    </View>
   );
-};
-
-export default Home;
-
-Home.options = {
-  statusBar: {
-    backgroundColor: '#fff',
-  },
 };
 
 const styles = StyleSheet.create({
@@ -47,3 +40,5 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
   },
 });
+
+export default Home;

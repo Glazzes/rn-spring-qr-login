@@ -26,12 +26,12 @@ class UserService(
             profilePicture = defaultPic)
 
         val savedUser = userRepository.save(userEntity)
-        return UserDTO(savedUser.username, savedUser.profilePicture)
+        return UserDTO(savedUser.id, savedUser.username, savedUser.profilePicture)
     }
 
     fun currentUser(): UserDTO {
         val user = SecurityUtil.getAuthenticatedUser()
-        return UserDTO(user.username, user.profilePicture)
+        return UserDTO(user.id, user.username, user.profilePicture)
     }
 
 }

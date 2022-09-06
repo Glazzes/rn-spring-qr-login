@@ -11,7 +11,7 @@ class EventEmitterService {
 
     fun sendUserShowEvent(emitter: SseEmitter) {
         val authenticatedUser = SecurityUtil.getAuthenticatedUser()
-        val data = UserDTO(authenticatedUser.username, authenticatedUser.profilePicture)
+        val data = UserDTO(authenticatedUser.id, authenticatedUser.username, authenticatedUser.profilePicture)
 
         val event = SseEmitter.event()
             .name("user.show")

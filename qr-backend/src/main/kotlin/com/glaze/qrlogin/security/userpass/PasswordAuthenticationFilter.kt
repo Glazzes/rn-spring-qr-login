@@ -5,6 +5,7 @@ import com.glaze.qrlogin.objects.LoginRequest
 import com.glaze.qrlogin.security.shared.SuccessfulAuthenticationToken
 import com.glaze.qrlogin.security.shared.UserToUserDetailsAdapter
 import com.glaze.qrlogin.utils.JwtUtil
+import org.springframework.http.HttpStatus
 import org.springframework.security.authentication.AuthenticationManager
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
 import org.springframework.security.core.Authentication
@@ -20,7 +21,7 @@ class PasswordAuthenticationFilter(
     private val objectMapper = jacksonObjectMapper()
 
     init {
-        this.setFilterProcessesUrl("/api/v1/login")
+        this.setFilterProcessesUrl("/api/v1/auth/login")
     }
 
     override fun attemptAuthentication(request: HttpServletRequest, response: HttpServletResponse): Authentication {
@@ -37,12 +38,14 @@ class PasswordAuthenticationFilter(
         chain: FilterChain,
         authResult: Authentication
     ) {
-        val authentication = SuccessfulAuthenticationToken(authResult.principal as UserToUserDetailsAdapter)
-        authentication.isAuthenticated = true
+        val authenticatedUser = authResult.principal as UserToUserDetailsAdapter
+        val successfulAuthenticationToken = SuccessfulAuthenticationToken(authenticatedUser)
+        successfulAuthenticationToken.isAuthenticated = true
 
-        SecurityContextHolder.getContext().authentication = authentication
+        SecurityContextHolder.getContext().authentication = successfulAuthenticationToken
+
         val token = JwtUtil.createToken(authResult.name)
-        response.addHeader("Token", "Bearer $token")
+        response.addHeader("Authorization", "Bearer $token")
         chain.doFilter(request, response)
     }
 }
