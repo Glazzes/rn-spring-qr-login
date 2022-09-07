@@ -18,12 +18,14 @@ class GlobalAuthenticationFilter(
 ): OncePerRequestFilter() {
 
     override fun shouldNotFilter(request: HttpServletRequest): Boolean {
-        val notFilteredRequests = mutableListOf(
+        val nonFilteredRequests = mutableListOf(
             AntPathRequestMatcher("/api/v1/events/*/register", HttpMethod.GET.name),
-            AntPathRequestMatcher("/api/v1/auth/login", HttpMethod.POST.name)
+            AntPathRequestMatcher("/api/v1/auth/login", HttpMethod.POST.name),
+            AntPathRequestMatcher("/api/v1/users", HttpMethod.POST.name),
+            AntPathRequestMatcher("/api/v1/login/qr", HttpMethod.POST.name)
         )
 
-        return notFilteredRequests.any { it.matches(request) }
+        return nonFilteredRequests.any { it.matches(request) }
     }
 
     override fun doFilterInternal(

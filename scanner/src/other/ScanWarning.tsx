@@ -1,12 +1,12 @@
 import {Dimensions} from 'react-native';
 import React from 'react';
 import {Box, Image, VStack, Text, Button} from 'native-base';
-import {StackScreens} from '../../navigation/stackScreens';
+import {StackScreens} from '../navigation/stackScreens';
 import {NavigationProp} from '@react-navigation/native';
 
 const {width} = Dimensions.get('window');
 const SIZE = width * 0.9;
-const gateway = require('../../assets/gateway.png');
+const gateway = require('../assets/gateway.png');
 
 type ScanWarningProps = {
   navigation: NavigationProp<StackScreens, 'Warning'>;

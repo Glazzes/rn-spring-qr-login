@@ -1,23 +1,27 @@
 import {Dimensions} from 'react-native';
 import React from 'react';
 import {Text, Box, Image, VStack, Button} from 'native-base';
-import Info from '../utils/Info';
-import {Information} from '../../types/information';
 import {NavigationProp, RouteProp} from '@react-navigation/native';
-import {StackScreens} from '../../navigation/stackScreens';
+import axios from 'axios';
+import {useSnapshot} from 'valtio';
+import {Information} from '../utils/types';
+import {StackScreens} from '../navigation/stackScreens';
+import {authState} from '../store/authStore';
+import {qrCancelLoginEventUrl, qrLoginPerformEventUrl} from '../utils/urls';
+import Info from './Info';
 
 const {width, height} = Dimensions.get('window');
-const found = require('../../assets/found.png');
+const found = require('../assets/found.png');
 
 const paths: {[id: string]: Information} = {
   success: {
-    image: require('../../assets/scan-success.png'),
+    image: require('../assets/scan-success.png'),
     alt: 'Cat took over your phone',
     title: 'Cats took over your phone',
     info: "You've been logged into your device successfully",
   },
   notFound: {
-    image: require('../../assets/not-found.png'),
+    image: require('../assets/not-found.png'),
     alt: 'Cat is looking at an empty bowl',
     title: "It's empty?",
     info: 'We could not log you into your device, you may have taken too long or there was not such device in first place',
@@ -33,12 +37,33 @@ const DeviceInformation: React.FC<DeviceInformationProps> = ({
   navigation,
   route,
 }) => {
-  const popToRoot = () => {
-    navigation.navigate('Home');
+  const state = useSnapshot(authState);
+
+  const login = async () => {
+    const config = {headers: {Authorization: state.accessToken}};
+
+    await axios.post(
+      qrLoginPerformEventUrl(route.params.id),
+      route.params.qrCode,
+      config,
+    );
+    navigation.navigate('Success', {information: paths.success});
   };
 
-  const toSuccess = () => {
-    navigation.navigate('Success', {information: paths.success});
+  const cancelLogin = async () => {
+    const config = {headers: {Authorization: state.accessToken}};
+    const res = await axios.post(
+      qrCancelLoginEventUrl(route.params.id),
+      undefined,
+      config,
+    );
+
+    if (res.status === 404) {
+      navigation.navigate('Success', {information: paths.notFound});
+      return;
+    }
+
+    navigation.navigate('Home');
   };
 
   return (
@@ -69,7 +94,7 @@ const DeviceInformation: React.FC<DeviceInformationProps> = ({
             bgColor={'#1d1d1d'}
             textTransform={'uppercase'}
             mb={'2'}
-            onPress={toSuccess}>
+            onPress={login}>
             Log me in
           </Button>
           <Button
@@ -78,7 +103,7 @@ const DeviceInformation: React.FC<DeviceInformationProps> = ({
             borderColor={'#1d1d1d'}
             color={'#1d1d1d'}
             textTransform={'uppercase'}
-            onPress={popToRoot}>
+            onPress={cancelLogin}>
             <Info text={'This is not my device'} />
           </Button>
         </VStack>

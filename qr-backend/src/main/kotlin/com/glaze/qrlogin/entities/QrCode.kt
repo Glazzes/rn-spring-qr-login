@@ -10,4 +10,8 @@ class QrCode (
     @Indexed var issuedFor: String,
     @Indexed var mobileId: String,
     @Indexed var deviceId: String,
+    var deviceName: String,
+    var os: String,
+    var ipAddress: String,
+    var location: String,
 )

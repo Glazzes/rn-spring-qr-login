@@ -1,15 +1,15 @@
 import {View, Text, StyleSheet, ActivityIndicator, Image, Pressable, Animated} from "react-native";
 import React, {useEffect, useMemo, useRef, useState} from "react";
-import {QrCode, User} from "./types";
+import {QrCode, User} from "../utils/types";
 import {browserName, browserVersion, osName, osVersion} from "react-device-detect";
 import {QRCodeSVG} from "qrcode.react";
 
 // @ts-ignore
 import {v4 as uuid} from "uuid";
-import {SIZE} from "./contants";
+import {SIZE} from "../utils/contants";
 import axios from "axios";
-import {SourceEvents} from "./enums";
-import {getEventSourceUrl, qrLogin} from "./utils/urls";
+import {SourceEvents} from "../utils/enums";
+import {getEventSourceUrl, qrLogin} from "../utils/urls";
 
 type QrCodeLoginProps = {};
 
@@ -33,13 +33,19 @@ const QrCodeLogin: React.FC<QrCodeLoginProps> = ({}) => {
 
   const eventSource = useMemo(() => {
     return new EventSource(getEventSourceUrl(qrCode.deviceId));
-  }, [qrCode]);
+  }, [qrCode.deviceId]);
 
   const reset = () => {
+    setShowQr(false);
     animateContainer(0);
-    setQrCode({...qrCode, deviceId: uuid(), mobileId: "", issuedFor: ""});
+    setQrCode((qr) => ({...qr, deviceId: uuid(), mobileId: "", issuedFor: ""}));
     setUser({id: "", username: "", profilePicture: ""});
     eventSource.close();
+
+    const tout = setTimeout(() => {
+      setShowQr(true);
+      clearTimeout(tout);
+    }, 5000);
   };
 
   const resetAndClearInterval = () => {
@@ -49,39 +55,57 @@ const QrCodeLogin: React.FC<QrCodeLoginProps> = ({}) => {
   };
 
   const animateContainer = (toValue: number) => {
-    Animated.timing(translateX, {toValue, duration: 500, useNativeDriver: true}).start();
+    Animated.timing(translateX, {toValue, duration: 500, useNativeDriver: false}).start();
   };
 
   useEffect(() => {
     axios
       .get("https://freeipapi.com/api/json")
       .then(({data}) => {
-        setQrCode({
-          ...qrCode,
+        setQrCode((qr) => ({
+          ...qr,
           ipAddress: data.ipAddress,
           location: `${data.cityName}, ${data.countryName}`,
-        });
+        }));
 
         setShowQr(true);
       })
       .catch((e) => console.log(e));
+  }, []);
 
-    eventSource.addEventListener(SourceEvents.USER_SHOW, ({data}: {data: User}) => {
-      setUser(data);
+  useEffect(() => {
+    // @ts-ignore
+    const userShow = (e) => {
+      const user = JSON.parse(e.data) as User;
+      setUser(user);
+      setQrCode((qr) => ({...qr, issuedFor: user.id, mobileId: "some-mobile-id"}));
       animateContainer(-SIZE);
-    });
+    };
 
-    eventSource.addEventListener(SourceEvents.LOGIN_PERFORM, () => {
-      axios.post(qrLogin, qrCode).then(() => console.log("successful authentication"));
-    });
+    const login = () => {
+      // there's no way to obtain the current qr code but using a set state function
+      setQrCode((qr) => {
+        fetch(qrLogin, {method: "POST", body: JSON.stringify(qr)}).then(() =>
+          console.log("successful login"),
+        );
 
+        return qr;
+      });
+    };
+
+    eventSource.addEventListener(SourceEvents.USER_SHOW, userShow);
+    eventSource.addEventListener(SourceEvents.LOGIN_PERFORM, login);
     eventSource.addEventListener(SourceEvents.LOGIN_CANCEL, resetAndClearInterval);
 
     return () => {
+      eventSource.removeEventListener(SourceEvents.USER_SHOW, userShow);
+      eventSource.removeEventListener(SourceEvents.LOGIN_PERFORM, login);
+      eventSource.removeEventListener(SourceEvents.LOGIN_CANCEL, resetAndClearInterval);
       eventSource.close();
+
       clearInterval(interval);
     };
-  }, []);
+  }, [eventSource]);
 
   return (
     <View style={styles.topContainer}>

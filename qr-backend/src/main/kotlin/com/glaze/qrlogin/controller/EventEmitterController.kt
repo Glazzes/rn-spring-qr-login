@@ -24,6 +24,7 @@ class EventEmitterController(
         val runnable = Runnable { eventEmitters.remove(id) }
         emitter.onTimeout(runnable)
         emitter.onCompletion(runnable)
+        emitter.onError{ eventEmitters.remove(id) }
 
         eventEmitters.save(id, emitter)
         return emitter

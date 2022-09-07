@@ -22,7 +22,12 @@ class QrCodeService(
         val entity = QrCode(
             issuedFor = request.issuedFor,
             mobileId = request.mobileId,
-            deviceId = request.deviceId)
+            deviceId = request.deviceId,
+            deviceName = request.deviceName,
+            os = request.os,
+            location = request.location,
+            ipAddress = request.ipAddress
+        )
 
         return qrCodeRepository.save(entity)
     }

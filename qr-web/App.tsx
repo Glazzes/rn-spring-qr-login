@@ -1,10 +1,10 @@
 import {StyleSheet, Text, View} from "react-native";
-import QrCodeLogin from "./src/QrCodeLogin";
+import {Login} from "./src/components";
 
 export default function App() {
   return (
     <View style={styles.container}>
-      <QrCodeLogin />
+      <Login />
     </View>
   );
 }
@@ -15,5 +15,6 @@ const styles = StyleSheet.create({
     backgroundColor: "#fff",
     alignItems: "center",
     justifyContent: "center",
+    flexDirection: "row",
   },
 });

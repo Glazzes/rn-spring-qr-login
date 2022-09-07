@@ -10,7 +10,6 @@ import org.springframework.security.authentication.AuthenticationProvider
 import org.springframework.security.core.Authentication
 import org.springframework.stereotype.Component
 
-@Component
 class QrAuthenticationProvider(
     private val qrCodeRepository: QrCodeRepository,
     private val userDetailsService: RedisUserDetailsService,
@@ -24,7 +23,7 @@ class QrAuthenticationProvider(
             throw QrRequestNotFoundException("There was not a qr code registered with these credentials")
         }
 
-        val principal = userDetailsService.loadUserByUsername(issuedFor) as UserToUserDetailsAdapter
+        val principal = userDetailsService.loadUserById(issuedFor) as UserToUserDetailsAdapter
         val successfulAuthentication = SuccessfulAuthenticationToken(principal)
         successfulAuthentication.isAuthenticated = true
 
@@ -32,6 +31,6 @@ class QrAuthenticationProvider(
     }
 
     override fun supports(authentication: Class<*>): Boolean {
-        return authentication == QrAuthenticationToken::class.java
+        return authentication.isAssignableFrom(QrAuthenticationToken::class.java)
     }
 }

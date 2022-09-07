@@ -31,11 +31,12 @@ const Login = () => {
   const login = async () => {
     try {
       const res = await axios.post(passwordLogin, {username, password});
-      const token = res.headers['Authorization'];
+      const token = res.headers['authorization'];
       if (token) {
         setAccessToken(token);
       }
     } catch (e) {
+      console.log(e);
       Alert.alert('Error while logging in');
     }
   };
@@ -43,7 +44,7 @@ const Login = () => {
   return (
     <View style={styles.root}>
       <Image
-        source={require('./react.png')}
+        source={require('../assets/react.png')}
         style={styles.image}
         resizeMode={'cover'}
       />

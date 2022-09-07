@@ -4,6 +4,13 @@ export type User = {
   profilePicture: string;
 };
 
+export type Information = {
+  image: any;
+  alt: string;
+  title: string;
+  info: string;
+};
+
 export type QrCode = {
   issuedFor: string;
   mobileId: string;

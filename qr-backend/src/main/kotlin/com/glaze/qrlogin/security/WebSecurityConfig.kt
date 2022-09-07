@@ -12,6 +12,7 @@ import org.springframework.security.authentication.AuthenticationManager
 import org.springframework.security.authentication.ProviderManager
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider
 import org.springframework.security.config.annotation.web.builders.HttpSecurity
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity
 import org.springframework.security.config.http.SessionCreationPolicy
 import org.springframework.security.core.userdetails.UserDetailsService
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
@@ -19,7 +20,7 @@ import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.security.web.SecurityFilterChain
 import org.springframework.web.cors.CorsConfiguration
 
-@Configuration
+@EnableWebSecurity
 class WebSecurityConfig (
     private val userDetailsService: UserDetailsService,
     private val qrCodeRepository: QrCodeRepository
@@ -42,10 +43,10 @@ class WebSecurityConfig (
         http.csrf { it.disable() }
             .cors { it.configurationSource {
                 val configuration = CorsConfiguration()
-                configuration.allowedMethods = listOf("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS")
+                configuration.allowedMethods = mutableListOf("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS")
                 configuration.allowCredentials = true
                 configuration.maxAge = 60 * 60 * 1000
-                configuration.allowedOrigins = listOf("http://localhost:19006/")
+                configuration.allowedOrigins = mutableListOf("http://localhost:19006")
 
                 configuration
             }}
@@ -70,7 +71,6 @@ class WebSecurityConfig (
             )
             .httpBasic { it.disable() }
             .formLogin { it.disable() }
-
 
         return http.build()
     }

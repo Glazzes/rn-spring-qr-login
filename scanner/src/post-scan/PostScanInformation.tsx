@@ -2,7 +2,7 @@ import {Dimensions} from 'react-native';
 import React, {useEffect} from 'react';
 import {Box, Button, Image, StatusBar, Text, VStack} from 'native-base';
 import {NavigationProp, RouteProp} from '@react-navigation/native';
-import {StackScreens} from '../../navigation/stackScreens';
+import {StackScreens} from '../navigation/stackScreens';
 
 const {width, height} = Dimensions.get('window');
 

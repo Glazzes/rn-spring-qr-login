@@ -4,15 +4,15 @@ import {Home} from './src/home';
 import {StackScreens} from './src/navigation/stackScreens';
 import {NativeBaseProvider} from 'native-base';
 import {createSharedElementStackNavigator} from 'react-navigation-shared-element';
-import {
-  DeviceInformation,
-  PostScanInformation,
-  Scanner,
-  ScanWarning,
-} from './src/qr-login';
 import {useSnapshot} from 'valtio';
 import {authState} from './src/store/authStore';
-import Login from './src/qr-login/Login';
+import Login from './src/login/Login';
+import {LogBox} from 'react-native';
+import {DeviceInformation, PostScanInformation} from './src/post-scan';
+import {Scanner} from './src/scanner';
+import ScanWarning from './src/other/ScanWarning';
+
+LogBox.ignoreLogs(['[react-native-gesture-handler]']);
 
 const Stack = createSharedElementStackNavigator<StackScreens>();
 

@@ -18,4 +18,10 @@ class RedisUserDetailsService(
 
         return UserToUserDetailsAdapter(user)
     }
+    fun loadUserById(id: String): UserDetails {
+        val user = userRepository.findById(id)
+            .orElseThrow { UsernameNotFoundException("Could not find user with id $id") }
+
+        return UserToUserDetailsAdapter(user)
+    }
 }
