@@ -1,16 +1,18 @@
 ## React native + Spring boot qr code login
 
+https://user-images.githubusercontent.com/52082794/189234837-29d34d7a-4f62-478f-b4e3-6f357303d282.mp4
+
 ### About
 
 This project has been done with building custom authentication flows in mind as spring security's architecture offers the necesary building blocks to create these with ease.
 
-### How it works
+### How it works?
 
 On the browser we make use of browser's [EventSource](https://developer.mozilla.org/es/docs/Web/API/EventSource) class in order to have unidirectional events beetwen the server and the browser.
 
 On the server we keep reference to each [EventSource](https://developer.mozilla.org/es/docs/Web/API/EventSource) with the [SSEmitter](https://docs.spring.io/spring-framework/docs/current/javadoc-api/org/springframework/web/servlet/mvc/method/annotation/SseEmitter.html) class, so wen can send events to each particular source
 
-On the mobile app we scan the qr-code which has missing entries that will be fullfied by the mobie app, once fullfiled we saved this code to the backend, once saved, we'll send the missing entries to the browser via event source events, so both the backend and the browser have the same qr-code, at this point the user can now login by sending the qr-code to the backend, if a code with the same entries is found it's considered to be a successful login.
+On the mobile app we scan the qr-code which has missing entries that will be fullfiled by the mobie app, once fullfiled we saved this code to the backend, once saved, we'll send the missing entries to the browser via event source events, so both the backend and the browser have the same qr-code, at this point the user can now login by sending the qr-code to the backend, if a code with the same entries is found it's considered to be a successful login.
 
 There're some things to keep in mind:
 
