@@ -7,8 +7,8 @@ import {StackScreens} from '../navigation/stackScreens';
 const {width, height} = Dimensions.get('window');
 
 type PostScanInformationProps = {
-  navigation: NavigationProp<StackScreens, 'Success'>;
-  route: RouteProp<StackScreens, 'Success'>;
+  navigation: NavigationProp<StackScreens, 'ScanResult'>;
+  route: RouteProp<StackScreens, 'ScanResult'>;
 };
 
 const PostScanInformation: React.FC<PostScanInformationProps> = ({

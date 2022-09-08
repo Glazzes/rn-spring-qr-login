@@ -1,6 +1,6 @@
 import {View, Text, StyleSheet} from "react-native";
 import React from "react";
-import {SIZE} from "../utils/contants";
+import {SIZE} from "../../utils/contants";
 import UsernamePasswordLogin from "./UsernamePasswordLogin";
 import QrCodeLogin from "./QrCodeLogin";
 
@@ -18,6 +18,10 @@ const Login: React.FC<LoginProps> = ({}) => {
 
 const styles = StyleSheet.create({
   root: {
+    flex: 1,
+    backgroundColor: "#fff",
+    justifyContent: "center",
+    alignItems: "center",
     flexDirection: "row",
   },
   divider: {

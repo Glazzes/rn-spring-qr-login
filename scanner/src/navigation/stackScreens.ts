@@ -15,5 +15,5 @@ export type StackScreens = {
   };
 
   Scanner: undefined;
-  Success: {information: Information};
+  ScanResult: {information: Information};
 };

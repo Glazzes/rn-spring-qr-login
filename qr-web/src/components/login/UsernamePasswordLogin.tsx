@@ -1,10 +1,9 @@
-import {View, Text, StyleSheet, Dimensions, TextInput, Pressable, Image} from "react-native";
+import {View, Text, StyleSheet, Dimensions, TextInput, Pressable, Image, Alert} from "react-native";
 import React, {useState} from "react";
-import {passwordLogin} from "../utils/urls";
-import {SIZE} from "../utils/contants";
-
-const {width} = Dimensions.get("window");
-const INPUT_WIDTH = width * 0.75;
+import {passwordLogin} from "../../utils/urls";
+import {SIZE} from "../../utils/contants";
+import axios from "axios";
+import {setAccessToken} from "../../utils/authStore";
 
 const UsernamePasswordLogin = () => {
   const [username, setUsername] = useState<string>("");
@@ -19,9 +18,17 @@ const UsernamePasswordLogin = () => {
   };
 
   const login = () => {
-    fetch(passwordLogin, {method: "POST", body: JSON.stringify({username, password})}).then((res) =>
-      console.log(res.headers),
-    );
+    axios
+      .post(passwordLogin, {username, password})
+      .then((res) => {
+        const token = res.headers["authorization"];
+        if (token) {
+          setAccessToken(token);
+        } else {
+          Alert.alert("Login successfult but no access token was present");
+        }
+      })
+      .catch((e) => console.log(e.response));
   };
 
   return (

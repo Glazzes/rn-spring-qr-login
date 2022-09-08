@@ -16,10 +16,10 @@ class QrCodeController(
 ){
 
     @PostMapping
-    fun save(@RequestBody request: QrCodeLoginRequest): ResponseEntity<*> {
-        val thing = qrCodeService.save(request)
-        return ResponseEntity.status(HttpStatus.OK)
-            .body(thing)
+    fun save(@RequestBody request: QrCodeLoginRequest): ResponseEntity<Unit> {
+        qrCodeService.save(request)
+        return ResponseEntity.status(HttpStatus.NO_CONTENT)
+            .build()
     }
 
 }

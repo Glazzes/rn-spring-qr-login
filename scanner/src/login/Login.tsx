@@ -31,7 +31,7 @@ const Login = () => {
   const login = async () => {
     try {
       const res = await axios.post(passwordLogin, {username, password});
-      const token = res.headers['authorization'];
+      const token = res.headers.authorization;
       if (token) {
         setAccessToken(token);
       }

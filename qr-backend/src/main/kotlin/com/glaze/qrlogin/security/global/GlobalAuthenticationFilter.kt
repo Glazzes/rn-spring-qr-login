@@ -19,10 +19,11 @@ class GlobalAuthenticationFilter(
 
     override fun shouldNotFilter(request: HttpServletRequest): Boolean {
         val nonFilteredRequests = mutableListOf(
-            AntPathRequestMatcher("/api/v1/events/*/register", HttpMethod.GET.name),
-            AntPathRequestMatcher("/api/v1/auth/login", HttpMethod.POST.name),
-            AntPathRequestMatcher("/api/v1/users", HttpMethod.POST.name),
-            AntPathRequestMatcher("/api/v1/login/qr", HttpMethod.POST.name)
+            AntPathRequestMatcher("/api/v1/events/{id}/register"),
+            AntPathRequestMatcher("/api/v1/events/{id}"),
+            AntPathRequestMatcher("/api/v1/auth/login"),
+            AntPathRequestMatcher("/api/v1/users"),
+            AntPathRequestMatcher("/api/v1/login/qr")
         )
 
         return nonFilteredRequests.any { it.matches(request) }

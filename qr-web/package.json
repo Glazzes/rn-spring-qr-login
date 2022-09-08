@@ -10,6 +10,8 @@
     "eject": "expo eject"
   },
   "dependencies": {
+    "@react-navigation/native": "^6.0.12",
+    "@react-navigation/stack": "^6.2.3",
     "axios": "^0.27.2",
     "expo": "~44.0.0",
     "expo-status-bar": "~1.2.0",
@@ -18,8 +20,11 @@
     "react-device-detect": "^2.2.2",
     "react-dom": "17.0.1",
     "react-native": "0.64.3",
+    "react-native-safe-area-context": "3.3.2",
+    "react-native-screens": "~3.10.1",
     "react-native-web": "0.17.1",
-    "uuid": "^8.3.2"
+    "uuid": "^8.3.2",
+    "valtio": "^1.7.0"
   },
   "devDependencies": {
     "@babel/core": "^7.12.9",

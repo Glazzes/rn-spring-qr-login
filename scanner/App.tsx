@@ -45,7 +45,7 @@ const App: React.FC = () => {
               component={DeviceInformation}
             />
 
-            <Stack.Screen name={'Success'} component={PostScanInformation} />
+            <Stack.Screen name={'ScanResult'} component={PostScanInformation} />
           </Stack.Navigator>
         )}
       </NavigationContainer>

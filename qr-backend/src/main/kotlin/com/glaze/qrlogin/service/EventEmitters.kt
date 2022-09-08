@@ -6,7 +6,11 @@ import java.util.concurrent.ConcurrentHashMap
 
 @Component
 class EventEmitters {
-    val emitters: MutableMap<String, SseEmitter> = ConcurrentHashMap()
+    private val emitters: MutableMap<String, SseEmitter> = ConcurrentHashMap()
+
+    fun get(id: String): SseEmitter? {
+        return emitters[id]
+    }
 
     fun save(key: String, emitter: SseEmitter) {
         emitters[key] = emitter

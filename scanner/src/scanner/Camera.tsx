@@ -64,6 +64,8 @@ const Camera: React.FC = () => {
         saveQrCode(qrCode);
       } catch (e) {
         Alert.alert('This is not one of our qr codes');
+      } finally {
+        scanning.current = false;
       }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps

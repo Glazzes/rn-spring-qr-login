@@ -1,0 +1,5 @@
+spring:
+  redis:
+    host: redisdb
+    port: 6379
+    database: 0

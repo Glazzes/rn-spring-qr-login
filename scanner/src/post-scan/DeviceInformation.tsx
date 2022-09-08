@@ -1,4 +1,4 @@
-import {Dimensions} from 'react-native';
+import {Dimensions, Alert} from 'react-native';
 import React from 'react';
 import {Text, Box, Image, VStack, Button} from 'native-base';
 import {NavigationProp, RouteProp} from '@react-navigation/native';
@@ -39,31 +39,53 @@ const DeviceInformation: React.FC<DeviceInformationProps> = ({
 }) => {
   const state = useSnapshot(authState);
 
-  const login = async () => {
+  const login = () => {
     const config = {headers: {Authorization: state.accessToken}};
 
-    await axios.post(
-      qrLoginPerformEventUrl(route.params.id),
-      route.params.qrCode,
-      config,
-    );
-    navigation.navigate('Success', {information: paths.success});
+    axios
+      .post(
+        qrLoginPerformEventUrl(route.params.id),
+        route.params.qrCode,
+        config,
+      )
+      .then(() => {
+        navigation.navigate('ScanResult', {
+          information: paths.success,
+        });
+      })
+      .catch(e => {
+        if (e.response.status === 404) {
+          navigation.navigate('ScanResult', {
+            information: paths.notFound,
+          });
+        }
+
+        if (e.response.status === 500) {
+          Alert.alert('There was a problem while logging in');
+        }
+      });
   };
 
   const cancelLogin = async () => {
     const config = {headers: {Authorization: state.accessToken}};
-    const res = await axios.post(
-      qrCancelLoginEventUrl(route.params.id),
-      undefined,
-      config,
-    );
 
-    if (res.status === 404) {
-      navigation.navigate('Success', {information: paths.notFound});
-      return;
+    try {
+      await axios.post(
+        qrCancelLoginEventUrl(route.params.id),
+        undefined,
+        config,
+      );
+
+      navigation.navigate('Home');
+    } catch (e) {
+      if (e.response.status === 500) {
+        Alert.alert('Error sending signal to devide');
+      }
+
+      if (e.response.status === 404) {
+        navigation.navigate('Home');
+      }
     }
-
-    navigation.navigate('Home');
   };
 
   return (

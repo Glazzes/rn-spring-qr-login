@@ -7,7 +7,6 @@ import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter
-import java.util.concurrent.ConcurrentHashMap
 
 @RestController
 @RequestMapping("/api/v1/events")
@@ -32,7 +31,7 @@ class EventEmitterController(
 
     @PostMapping(path = ["/{id}/user-show"])
     fun sendUserShowEvent(@PathVariable id:String): ResponseEntity<Unit> {
-        val emitter = eventEmitters.emitters[id] ?:
+        val emitter = eventEmitters.get(id) ?:
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
                 .build()
 
@@ -43,7 +42,7 @@ class EventEmitterController(
 
     @PostMapping(path = ["/{id}/login-cancel"])
     fun sendLoginCancelEvent(@PathVariable id: String): ResponseEntity<Unit> {
-        val emitter = eventEmitters.emitters[id] ?:
+        val emitter = eventEmitters.get(id) ?:
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
                 .build()
 
@@ -53,7 +52,7 @@ class EventEmitterController(
     }
     @PostMapping(path = ["/{id}/login-perform"])
     fun sendLoginPerformEvent(@PathVariable id: String): ResponseEntity<Unit> {
-        val emitter = eventEmitters.emitters[id] ?:
+        val emitter = eventEmitters.get(id) ?:
         return ResponseEntity.status(HttpStatus.NOT_FOUND)
             .build()
 
@@ -64,6 +63,10 @@ class EventEmitterController(
 
     @DeleteMapping(path = ["/{id}"])
     fun delete(@PathVariable id: String): ResponseEntity<Unit> {
+        eventEmitters.get(id) ?:
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                .build()
+
         eventEmitters.remove(id)
         return ResponseEntity.status(HttpStatus.NO_CONTENT)
             .build()

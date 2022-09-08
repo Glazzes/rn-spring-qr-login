@@ -1,3 +1,8 @@
+export type StackScreens = {
+  Login: undefined;
+  Home: {accessToken: string};
+};
+
 export type User = {
   id: string;
   username: string;

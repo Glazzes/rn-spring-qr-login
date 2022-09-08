@@ -38,6 +38,7 @@ class QrAuthenticationFilter(
         val token = JwtUtil.createToken(authResult.name)
         response.status = HttpStatus.NO_CONTENT.value()
         response.addHeader("Authorization", "Bearer $token")
+        response.addHeader("Access-Control-Expose-Headers", "Authorization")
         chain.doFilter(request, response)
     }
 }

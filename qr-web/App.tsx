@@ -1,11 +1,27 @@
+import {NavigationContainer} from "@react-navigation/native";
+import {createStackNavigator} from "@react-navigation/stack";
 import {StyleSheet, Text, View} from "react-native";
-import {Login} from "./src/components";
+import {useSnapshot} from "valtio";
+import {Login, Home} from "./src/components";
+import {authState} from "./src/utils/authStore";
+import {StackScreens} from "./src/utils/types";
+
+const Stack = createStackNavigator<StackScreens>();
+const isLoggedIn = false;
 
 export default function App() {
+  const state = useSnapshot(authState);
+
   return (
-    <View style={styles.container}>
-      <Login />
-    </View>
+    <NavigationContainer>
+      <Stack.Navigator initialRouteName={"Login"} screenOptions={{headerShown: false}}>
+        {state.accessToken !== "" ? (
+          <Stack.Screen name={"Home"} component={Home} />
+        ) : (
+          <Stack.Screen name={"Login"} component={Login} />
+        )}
+      </Stack.Navigator>
+    </NavigationContainer>
   );
 }
 

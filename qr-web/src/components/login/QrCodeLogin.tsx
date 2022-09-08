@@ -1,15 +1,25 @@
-import {View, Text, StyleSheet, ActivityIndicator, Image, Pressable, Animated} from "react-native";
+import {
+  View,
+  Text,
+  StyleSheet,
+  ActivityIndicator,
+  Image,
+  Pressable,
+  Animated,
+  Alert,
+} from "react-native";
 import React, {useEffect, useMemo, useRef, useState} from "react";
-import {QrCode, User} from "../utils/types";
 import {browserName, browserVersion, osName, osVersion} from "react-device-detect";
 import {QRCodeSVG} from "qrcode.react";
 
 // @ts-ignore
 import {v4 as uuid} from "uuid";
-import {SIZE} from "../utils/contants";
 import axios from "axios";
-import {SourceEvents} from "../utils/enums";
-import {getEventSourceUrl, qrLogin} from "../utils/urls";
+import {QrCode, User} from "../../utils/types";
+import {deleteEventUrl, getEventSourceUrl, qrLogin} from "../../utils/urls";
+import {SIZE} from "../../utils/contants";
+import {setAccessToken} from "../../utils/authStore";
+import {SourceEvents} from "../../utils/enums";
 
 type QrCodeLoginProps = {};
 
@@ -35,7 +45,21 @@ const QrCodeLogin: React.FC<QrCodeLoginProps> = ({}) => {
     return new EventSource(getEventSourceUrl(qrCode.deviceId));
   }, [qrCode.deviceId]);
 
+  const deleteEvetSoruce = async () => {
+    const res = await fetch(deleteEventUrl(qrCode.deviceId), {method: "DELETE"});
+    if (res.status === 204) {
+      console.log("source deleted");
+      return;
+    }
+
+    if (res.status === 404) {
+      console.log("source not found");
+      return;
+    }
+  };
+
   const reset = () => {
+    deleteEvetSoruce();
     setShowQr(false);
     animateContainer(0);
     setQrCode((qr) => ({...qr, deviceId: uuid(), mobileId: "", issuedFor: ""}));
@@ -45,7 +69,7 @@ const QrCodeLogin: React.FC<QrCodeLoginProps> = ({}) => {
     const tout = setTimeout(() => {
       setShowQr(true);
       clearTimeout(tout);
-    }, 5000);
+    }, 3000);
   };
 
   const resetAndClearInterval = () => {
@@ -85,9 +109,17 @@ const QrCodeLogin: React.FC<QrCodeLoginProps> = ({}) => {
     const login = () => {
       // there's no way to obtain the current qr code but using a set state function
       setQrCode((qr) => {
-        fetch(qrLogin, {method: "POST", body: JSON.stringify(qr)}).then(() =>
-          console.log("successful login"),
-        );
+        axios
+          .post(qrLogin, qr)
+          .then((res) => {
+            const token = res.headers["authorization"];
+            if (token) {
+              setAccessToken(token);
+            } else {
+              Alert.alert("Login successfult but no access token was present");
+            }
+          })
+          .catch((e) => console.log(e.response));
 
         return qr;
       });
@@ -202,6 +234,7 @@ const styles = StyleSheet.create({
     color: "#E94560",
     fontWeight: "bold",
     fontSize: 15,
+    textTransform: "capitalize",
   },
   button: {
     padding: 10,

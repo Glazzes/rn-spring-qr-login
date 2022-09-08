@@ -7,7 +7,6 @@ import com.glaze.qrlogin.security.qr.QrAuthenticationProvider
 import com.glaze.qrlogin.security.shared.RedisUserDetailsService
 import com.glaze.qrlogin.security.userpass.PasswordAuthenticationFilter
 import org.springframework.context.annotation.Bean
-import org.springframework.context.annotation.Configuration
 import org.springframework.security.authentication.AuthenticationManager
 import org.springframework.security.authentication.ProviderManager
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider
@@ -19,6 +18,8 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.security.web.SecurityFilterChain
 import org.springframework.web.cors.CorsConfiguration
+import org.springframework.web.servlet.config.annotation.CorsRegistry
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer
 
 @EnableWebSecurity
 class WebSecurityConfig (
@@ -38,25 +39,43 @@ class WebSecurityConfig (
         return ProviderManager(daoAuthenticationProvider, qrAuthenticationProvider)
     }
 
+
+    @Bean
+    fun webConfigurer(): WebMvcConfigurer {
+        return object : WebMvcConfigurer {
+            override fun addCorsMappings(registry: CorsRegistry) {
+                registry.addMapping("/**")
+                    .allowedOrigins("http://localhost:19006")
+                    .allowCredentials(true)
+                    .allowedMethods("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS", "HEAD")
+                    .allowedHeaders("*")
+                    .maxAge(60 * 60 * 1000)
+            }
+        }
+    }
+
     @Bean
     fun filterChain(http: HttpSecurity): SecurityFilterChain {
-        http.csrf { it.disable() }
-            .cors { it.configurationSource {
+        http.cors { it.configurationSource {
                 val configuration = CorsConfiguration()
-                configuration.allowedMethods = mutableListOf("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS")
+                configuration.allowedMethods = listOf("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS", "HEAD")
                 configuration.allowCredentials = true
                 configuration.maxAge = 60 * 60 * 1000
-                configuration.allowedOrigins = mutableListOf("http://localhost:19006")
+                configuration.allowedOrigins = listOf("http://localhost:19006")
+                configuration.allowedHeaders = listOf("*")
 
                 configuration
             }}
+            .csrf { it.disable() }
             .sessionManagement { it.sessionCreationPolicy(SessionCreationPolicy.STATELESS) }
             .authorizeRequests {
                 it.antMatchers(
                     "/api/v1/qrcode", "/api/v1/users/me", "/api/v1/events/*/user-show",
                     "/api/v1/events/*/login-cancel", "/api/v1/events/*/login-perform")
                         .authenticated()
-                    .antMatchers("/api/v1/auth/login", "/api/v1/login/qr", "/api/v1/events/*/register")
+                    .antMatchers(
+                        "/api/v1/auth/login", "/api/v1/login/qr", "/api/v1/events/*/register",
+                        "/api/v1/events/{id}")
                         .permitAll()
                     .antMatchers("/api/v1/users").anonymous()
                     .anyRequest()
