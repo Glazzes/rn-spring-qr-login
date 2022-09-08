@@ -1,9 +1,6 @@
 const BASE = "http://localhost:8080";
 const EVENTS = `${BASE}/api/v1/events`;
 
-const x = process.env.JAVA;
-console.log(x);
-
 export const qrLogin = `${BASE}/api/v1/login/qr`;
 export const passwordLogin = `${BASE}/api/v1/auth/login`;
 

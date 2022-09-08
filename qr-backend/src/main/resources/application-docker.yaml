@@ -1,5 +1,8 @@
 spring:
   redis:
-    host: redisdb
+    host: redis
     port: 6379
     database: 0
+
+frontend:
+  host: web

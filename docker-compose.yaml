@@ -1,0 +1,26 @@
+version: "3.7"
+services:
+
+  redis:
+    image: redis:6.2.4-alpine
+    container_name: redis
+    ports:
+      - "6379:6379"
+
+  backend:
+    build: qr-backend/
+    image: glaze/qr-backend
+    container_name: backend
+    ports:
+      - "8080:8080"
+    depends_on:
+      - redis
+
+  web:
+    build: qr-web/
+    image: glaze/qr-web
+    container_name: web
+    depends_on:
+      - backend
+    ports:
+      - "19006:19006"

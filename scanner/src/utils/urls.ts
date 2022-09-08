@@ -1,4 +1,4 @@
-const BASE = 'http://192.168.42.44:8080';
+const BASE = 'http://192.168.42.154:8080';
 const EVENTS = `${BASE}/api/v1/events`;
 const USERS = `${BASE}/api/v1/users`;
 

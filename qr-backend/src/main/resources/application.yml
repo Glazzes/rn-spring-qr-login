@@ -3,3 +3,6 @@ spring:
     host: localhost
     port: 6379
     database: 0
+
+frontend:
+  host: localhost

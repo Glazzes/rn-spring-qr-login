@@ -7,7 +7,6 @@ import {authState} from "./src/utils/authStore";
 import {StackScreens} from "./src/utils/types";
 
 const Stack = createStackNavigator<StackScreens>();
-const isLoggedIn = false;
 
 export default function App() {
   const state = useSnapshot(authState);
