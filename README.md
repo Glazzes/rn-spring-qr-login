@@ -45,3 +45,16 @@ $ npx react-native run android
 yarn
 $ yarn run android
 ```
+
+Once all services are up and running you can find on the following ports
+- 19006 for web
+- 8080 for backend
+
+As the last step, you must create an user by sending a request to `http://localhost:8080/api/v1/users` with the following schema:
+```json
+{
+    "username": "your username",
+    "password:": "your password",
+    "email": "some@email.com"
+}
+```
