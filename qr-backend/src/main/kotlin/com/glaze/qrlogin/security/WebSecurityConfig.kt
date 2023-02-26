@@ -6,6 +6,8 @@ import com.glaze.qrlogin.security.qr.QrAuthenticationFilter
 import com.glaze.qrlogin.security.qr.QrAuthenticationProvider
 import com.glaze.qrlogin.security.shared.RedisUserDetailsService
 import com.glaze.qrlogin.security.userpass.PasswordAuthenticationFilter
+import org.apache.tomcat.util.file.ConfigurationSource
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.annotation.Bean
 import org.springframework.security.authentication.AuthenticationManager
 import org.springframework.security.authentication.ProviderManager
@@ -18,6 +20,8 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.security.web.SecurityFilterChain
 import org.springframework.web.cors.CorsConfiguration
+import org.springframework.web.cors.CorsConfigurationSource
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource
 import org.springframework.web.servlet.config.annotation.CorsRegistry
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer
 
@@ -26,6 +30,9 @@ class WebSecurityConfig (
     private val userDetailsService: UserDetailsService,
     private val qrCodeRepository: QrCodeRepository
 ){
+
+    @Value(value = "\${web.app.origin}")
+    private lateinit var origin: String
 
     @Bean
     fun authenticationManager(): AuthenticationManager {
@@ -39,34 +46,21 @@ class WebSecurityConfig (
         return ProviderManager(daoAuthenticationProvider, qrAuthenticationProvider)
     }
 
-
-    @Bean
-    fun webConfigurer(): WebMvcConfigurer {
-        return object : WebMvcConfigurer {
-            override fun addCorsMappings(registry: CorsRegistry) {
-                registry.addMapping("/**")
-                    .allowedOrigins("http://localhost:19006")
-                    .allowCredentials(true)
-                    .allowedMethods("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS", "HEAD")
-                    .allowedHeaders("*")
-                    .maxAge(60 * 60 * 1000)
-            }
-        }
-    }
-
     @Bean
     fun filterChain(http: HttpSecurity): SecurityFilterChain {
-        http.cors { it.configurationSource {
-                val configuration = CorsConfiguration()
-                configuration.allowedMethods = listOf("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS", "HEAD")
-                configuration.allowCredentials = true
-                configuration.maxAge = 60 * 60 * 1000
-                configuration.allowedOrigins = listOf("http://localhost:19006")
-                configuration.allowedHeaders = listOf("*")
+        http.cors {
+            val configuration = CorsConfiguration()
+            configuration.allowedMethods = listOf("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS", "HEAD")
+            configuration.allowCredentials = true
+            configuration.maxAge = 60 * 60 * 1000
+            configuration.allowedOrigins = listOf(origin)
+            configuration.allowedHeaders = listOf("*")
 
-                configuration
-            }}
-            .csrf { it.disable() }
+            val source = UrlBasedCorsConfigurationSource()
+            source.registerCorsConfiguration("/**", configuration)
+
+            it.configurationSource(source)
+        }.csrf { it.disable() }
             .sessionManagement { it.sessionCreationPolicy(SessionCreationPolicy.STATELESS) }
             .authorizeRequests {
                 it.antMatchers(

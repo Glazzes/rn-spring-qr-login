@@ -20,5 +20,10 @@
         "@typescript-eslint"
     ],
     "rules": {
+        "quotes": ["error", "single"],
+        "indent": ["error", 2],
+        "linebreak-style":"error",
+        "max-len": ["error", 120],
+        "no-multiple-empty-lines": ["error", {"max": 1}]
     }
 }

@@ -1,4 +1,4 @@
-package com.glaze.qrlogin.objects
+package com.glaze.qrlogin.dtos.request
 
 data class QrCodeLoginRequest(
     val issuedFor: String,

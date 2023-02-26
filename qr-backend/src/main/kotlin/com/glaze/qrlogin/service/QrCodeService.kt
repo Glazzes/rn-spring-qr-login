@@ -2,8 +2,7 @@ package com.glaze.qrlogin.service
 
 import com.glaze.qrlogin.entities.QrCode
 import com.glaze.qrlogin.exception.AssociationException
-import com.glaze.qrlogin.objects.CreateQrCodeRequest
-import com.glaze.qrlogin.objects.QrCodeLoginRequest
+import com.glaze.qrlogin.dtos.request.QrCodeLoginRequest
 import com.glaze.qrlogin.repositories.QrCodeRepository
 import com.glaze.qrlogin.utils.SecurityUtil
 import org.springframework.stereotype.Service

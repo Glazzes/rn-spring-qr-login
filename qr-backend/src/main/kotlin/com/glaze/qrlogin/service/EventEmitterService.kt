@@ -1,7 +1,8 @@
 package com.glaze.qrlogin.service
 
-import com.glaze.qrlogin.entities.dto.UserDTO
+import com.glaze.qrlogin.dtos.response.UserDTO
 import com.glaze.qrlogin.utils.SecurityUtil
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.http.MediaType
 import org.springframework.stereotype.Service
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter
@@ -9,21 +10,38 @@ import org.springframework.web.servlet.mvc.method.annotation.SseEmitter
 @Service
 class EventEmitterService {
 
-    fun sendUserShowEvent(emitter: SseEmitter) {
+    @Value(value = "\${events.display-user}")
+    private lateinit var displayUserEventName: String
+
+    @Value(value = "\${events.perform-login}")
+    private lateinit var performLoginEventName: String
+
+    @Value(value = "\${events.cancel-login}")
+    private lateinit var cancelLoginEventName: String
+
+    fun sendDisplayUserEvent(emitter: SseEmitter) {
         val authenticatedUser = SecurityUtil.getAuthenticatedUser()
         val data = UserDTO(authenticatedUser.id, authenticatedUser.username, authenticatedUser.profilePicture)
 
         val event = SseEmitter.event()
-            .name("user.show")
+            .name(displayUserEventName)
             .data(data, MediaType.APPLICATION_JSON)
 
         emitter.send(event)
     }
 
-    fun sendLoginEvent(emitter: SseEmitter, eventName: String) {
+    fun sendPerfromLoginEvent(emitter: SseEmitter) {
         val event = SseEmitter.event()
-            .name(eventName)
+            .name(performLoginEventName)
             .data("dummy data")
+
+        emitter.send(event)
+    }
+
+    fun sendCancelLoginEventName(emitter: SseEmitter) {
+        val event = SseEmitter.event()
+                .name(cancelLoginEventName)
+                .data("dummy data")
 
         emitter.send(event)
     }

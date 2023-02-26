@@ -1,14 +1,13 @@
 package com.glaze.qrlogin.security.qr
 
 import com.glaze.qrlogin.exception.QrRequestNotFoundException
-import com.glaze.qrlogin.objects.QrCodeLoginRequest
+import com.glaze.qrlogin.dtos.request.QrCodeLoginRequest
 import com.glaze.qrlogin.repositories.QrCodeRepository
 import com.glaze.qrlogin.security.shared.RedisUserDetailsService
 import com.glaze.qrlogin.security.shared.SuccessfulAuthenticationToken
 import com.glaze.qrlogin.security.shared.UserToUserDetailsAdapter
 import org.springframework.security.authentication.AuthenticationProvider
 import org.springframework.security.core.Authentication
-import org.springframework.stereotype.Component
 
 class QrAuthenticationProvider(
     private val qrCodeRepository: QrCodeRepository,

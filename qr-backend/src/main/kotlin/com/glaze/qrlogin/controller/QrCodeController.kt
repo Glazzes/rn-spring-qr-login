@@ -1,6 +1,6 @@
 package com.glaze.qrlogin.controller
 
-import com.glaze.qrlogin.objects.QrCodeLoginRequest
+import com.glaze.qrlogin.dtos.request.QrCodeLoginRequest
 import com.glaze.qrlogin.service.QrCodeService
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity

@@ -1,14 +1,12 @@
 package com.glaze.qrlogin.service
 
 import com.glaze.qrlogin.entities.User
-import com.glaze.qrlogin.entities.dto.UserDTO
-import com.glaze.qrlogin.objects.CreateUserRequest
+import com.glaze.qrlogin.dtos.response.UserDTO
+import com.glaze.qrlogin.dtos.request.SignUpRequest
 import com.glaze.qrlogin.repositories.UserRepository
 import com.glaze.qrlogin.utils.SecurityUtil
-import org.springframework.http.ResponseEntity
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.stereotype.Service
-import org.springframework.web.bind.annotation.GetMapping
 
 @Service
 class UserService(
@@ -18,7 +16,7 @@ class UserService(
 
     private val defaultPic = "https://randomuser.me/api/portraits/men/15.jpg"
 
-    fun save(request: CreateUserRequest): UserDTO {
+    fun save(request: SignUpRequest): UserDTO {
         val userEntity = User(
             username = request.username,
             password = passwordEncoder.encode(request.password),
@@ -33,5 +31,7 @@ class UserService(
         val user = SecurityUtil.getAuthenticatedUser()
         return UserDTO(user.id, user.username, user.profilePicture)
     }
+
+    fun existsByEmail(email: String): Boolean = userRepository.existsByEmail(email)
 
 }

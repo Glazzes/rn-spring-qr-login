@@ -1,7 +1,7 @@
 package com.glaze.qrlogin.security.qr
 
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
-import com.glaze.qrlogin.objects.QrCodeLoginRequest
+import com.glaze.qrlogin.dtos.request.QrCodeLoginRequest
 import com.glaze.qrlogin.utils.JwtUtil
 import org.springframework.http.HttpMethod
 import org.springframework.http.HttpStatus

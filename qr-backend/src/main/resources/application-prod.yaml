@@ -5,10 +5,10 @@ events:
 
 spring:
   redis:
-    host: localhost
+    host: redis
     port: 6379
     database: 0
 
 web:
   app:
-    origin: http://localhost:19006
+    origin: web

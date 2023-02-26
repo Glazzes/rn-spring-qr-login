@@ -1,11 +1,10 @@
 package com.glaze.qrlogin.security.userpass
 
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
-import com.glaze.qrlogin.objects.LoginRequest
+import com.glaze.qrlogin.dtos.request.LoginRequest
 import com.glaze.qrlogin.security.shared.SuccessfulAuthenticationToken
 import com.glaze.qrlogin.security.shared.UserToUserDetailsAdapter
 import com.glaze.qrlogin.utils.JwtUtil
-import org.springframework.http.HttpStatus
 import org.springframework.security.authentication.AuthenticationManager
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
 import org.springframework.security.core.Authentication

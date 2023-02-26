@@ -8,7 +8,7 @@ import org.springframework.data.redis.core.index.Indexed
 class User(
     @Id var id: String? = null,
     @Indexed var username: String,
+    @Indexed val email: String,
     var password: String,
-    var email: String,
     var profilePicture: String
 )

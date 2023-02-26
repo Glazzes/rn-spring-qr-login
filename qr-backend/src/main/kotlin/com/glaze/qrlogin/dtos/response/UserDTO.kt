@@ -1,4 +1,4 @@
-package com.glaze.qrlogin.entities.dto
+package com.glaze.qrlogin.dtos.response
 
 data class UserDTO(
     val id: String?,

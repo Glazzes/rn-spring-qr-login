@@ -20,7 +20,12 @@ class EventEmitterController(
     @GetMapping(path = ["/{id}/register"], produces = [MediaType.TEXT_EVENT_STREAM_VALUE])
     fun register(@PathVariable id: String) : SseEmitter {
         val emitter = SseEmitter(timeout)
-        val runnable = Runnable { eventEmitters.remove(id) }
+
+        val runnable = Runnable {
+            println("Event emitter removed")
+            eventEmitters.remove(id)
+        }
+
         emitter.onTimeout(runnable)
         emitter.onCompletion(runnable)
         emitter.onError{ eventEmitters.remove(id) }
@@ -35,7 +40,7 @@ class EventEmitterController(
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
                 .build()
 
-        eventEmitterService.sendUserShowEvent(emitter)
+        eventEmitterService.sendDisplayUserEvent(emitter)
         return ResponseEntity.status(HttpStatus.NO_CONTENT)
             .build()
     }
@@ -46,7 +51,7 @@ class EventEmitterController(
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
                 .build()
 
-        eventEmitterService.sendLoginEvent(emitter, "login.cancel")
+        eventEmitterService.sendCancelLoginEventName(emitter)
         return ResponseEntity.status(HttpStatus.NO_CONTENT)
             .build()
     }
@@ -56,7 +61,7 @@ class EventEmitterController(
         return ResponseEntity.status(HttpStatus.NOT_FOUND)
             .build()
 
-        eventEmitterService.sendLoginEvent(emitter, "login.perform")
+        eventEmitterService.sendPerfromLoginEvent(emitter)
         return ResponseEntity.status(HttpStatus.NO_CONTENT)
             .build()
     }
