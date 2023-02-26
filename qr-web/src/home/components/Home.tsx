@@ -5,9 +5,7 @@ import {authState, setUser} from "../../utils/authStore";
 import axios from "axios";
 import {loggedInUser} from "../../utils/urls";
 
-type HomeProps = {};
-
-const Home: React.FC<HomeProps> = ({}) => {
+const Home: React.FC = () => {
   const state = useSnapshot(authState);
 
   useEffect(() => {

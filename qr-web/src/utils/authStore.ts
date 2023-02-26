@@ -11,10 +11,10 @@ export const authState = proxy<State>({
   user: {id: "", username: "", profilePicture: ""},
 });
 
-export function setUser(user: User) {
+export const setUser = (user: User) => {
   authState.user = user;
 }
 
-export function setAccessToken(token: string) {
+export const setAccessToken = (token: string) => {
   authState.accessToken = token;
 }

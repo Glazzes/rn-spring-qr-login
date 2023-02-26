@@ -1,4 +1,4 @@
-FROM amazoncorretto:17
+FROM amazoncorretto:17-alpine
 ENV SPRING_PROFILES_ACTIVE docker
 WORKDIR /app
 COPY build/libs/qr-login-0.0.1-SNAPSHOT.jar .
