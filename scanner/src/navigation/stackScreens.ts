@@ -1,9 +1,22 @@
 import {Information, QrCode} from '../utils/types';
 
 export type StackScreens = {
-  Login: undefined;
+  Modal: undefined;
+
+  Login: {
+    createdAccount: boolean;
+  };
+
+  CreateAccount: undefined;
+
+  CropEditor: {
+    uri: string;
+    width: number;
+    height: number;
+  };
 
   Home: undefined;
+
   Warning: undefined;
 
   DeviceInformation: {
@@ -15,5 +28,6 @@ export type StackScreens = {
   };
 
   Scanner: undefined;
+
   ScanResult: {information: Information};
 };

@@ -1,22 +1,24 @@
-const BASE = 'http://192.168.42.154:8080';
-const EVENTS = `${BASE}/api/v1/events`;
-const USERS = `${BASE}/api/v1/users`;
+// Auth
+export const apiAuthLogin = '/api/v1//auth/login';
 
-export const passwordLogin = `${BASE}/api/v1/auth/login`;
-export const me = `${USERS}/me`;
-export const registerEventSource = `${EVENTS}/register`;
-
-export const saveQrCodeUrl = `${BASE}/api/v1/qrcode`;
+// users
+export const apiUsersUrl = '/api/v1/users';
+export const apiUsersMeUrl = `${apiUsersUrl}/me`;
 
 // events
-export function qrLoginPerformEventUrl(id: String): string {
-  return `${EVENTS}/${id}/login-perform`;
-}
+const apiEvents = '/api/v1/events';
+export const registerEventSource = `${apiEvents}/register`;
+export const saveQrCodeUrl = '/api/v1/qrcode';
+export const passwordLogin = '$/api/v1/auth/login';
 
-export function qrCancelLoginEventUrl(id: string): string {
-  return `${EVENTS}/${id}/login-cancel`;
-}
+export const qrLoginPerformEventUrl = (id: String): string => {
+  return `${apiEvents}/${id}/login-perform`;
+};
 
-export function userShowEventUrl(id: string): string {
-  return `${EVENTS}/${id}/user-show`;
-}
+export const qrCancelLoginEventUrl = (id: string): string => {
+  return `${apiEvents}/${id}/login-cancel`;
+};
+
+export const userShowEventUrl = (id: string): string => {
+  return `${apiEvents}/${id}/user-show`;
+};

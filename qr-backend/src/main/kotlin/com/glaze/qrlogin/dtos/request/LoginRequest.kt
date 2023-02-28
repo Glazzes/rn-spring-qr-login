@@ -1,7 +1,7 @@
 package com.glaze.qrlogin.dtos.request
 
 import org.hibernate.validator.constraints.Length
-import javax.validation.constraints.NotBlank
+import jakarta.validation.constraints.NotBlank
 
 data class LoginRequest(
     @NotBlank(message = "{user.username.required}")

@@ -6,14 +6,17 @@ import com.glaze.qrlogin.service.UserService
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
-import javax.validation.Valid
+import org.springframework.web.multipart.MultipartFile
 
 @RestController
 @RequestMapping("/api/v1/users")
-class UserController(private val userService: UserService){
+class UserController(private val userService: UserService) {
 
     @PostMapping
-    fun save(@Valid @RequestBody request: SignUpRequest) : ResponseEntity<UserDTO> {
+    fun save(
+        @RequestParam(value = "file") picture: MultipartFile,
+        @RequestParam(value = "request") request: SignUpRequest
+    ) : ResponseEntity<UserDTO> {
         val dto = userService.save(request)
         return ResponseEntity.status(HttpStatus.CREATED)
             .body(dto)

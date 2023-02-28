@@ -2,6 +2,7 @@ package com.glaze.qrlogin.controller
 
 import com.glaze.qrlogin.dtos.request.QrCodeLoginRequest
 import com.glaze.qrlogin.service.QrCodeService
+import jakarta.validation.Valid
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.PostMapping
@@ -16,7 +17,7 @@ class QrCodeController(
 ){
 
     @PostMapping
-    fun save(@RequestBody request: QrCodeLoginRequest): ResponseEntity<Unit> {
+    fun save(@Valid @RequestBody request: QrCodeLoginRequest): ResponseEntity<Unit> {
         qrCodeService.save(request)
         return ResponseEntity.status(HttpStatus.NO_CONTENT)
             .build()

@@ -2,12 +2,18 @@ import {proxy} from 'valtio';
 import {User} from '../utils/types';
 
 type State = {
-  accessToken: string;
+  tokens: {
+    accessToken: string;
+    refreshToken: string;
+  };
   user: User;
 };
 
 export const authState = proxy<State>({
-  accessToken: '',
+  tokens: {
+    accessToken: '',
+    refreshToken: '',
+  },
   user: {
     id: '',
     username: '',
@@ -20,5 +26,5 @@ export const setUser = (user: User) => {
 };
 
 export const setAccessToken = (token: string) => {
-  authState.accessToken = token;
+  authState.tokens.accessToken = token;
 };
