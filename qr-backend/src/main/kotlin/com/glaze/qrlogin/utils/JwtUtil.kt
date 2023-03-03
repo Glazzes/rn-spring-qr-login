@@ -7,7 +7,7 @@ import java.util.*
 
 object JwtUtil {
 
-    fun createToken(subject: String): String {
+    fun createToken(subject: String, time: Long, unit: ChronoUnit): String {
         val issuedAt = Instant.now()
         val expiration = Instant.now()
             .plus(15L, ChronoUnit.MINUTES)

@@ -8,7 +8,8 @@ class EmailConstraintValidator(
         private val userRepository: UserRepository
 ): ConstraintValidator<EmailMustNotExists, String> {
 
-    override fun isValid(value: String, context: ConstraintValidatorContext?): Boolean {
+    override fun isValid(value: String, context: ConstraintValidatorContext): Boolean {
         return !userRepository.existsByEmail(value)
     }
+
 }

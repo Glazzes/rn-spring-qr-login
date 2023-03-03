@@ -1,27 +1,34 @@
 import {createSlice, PayloadAction} from '@reduxjs/toolkit';
+import {AccountCreationFields} from '../../utils/types';
 
 export type AccountDetails = {
   username: string;
+  email: string;
   password: string;
+  confirmation: string;
+};
+
+type FieldUpdate = {
+  name: AccountCreationFields;
+  value: string;
 };
 
 const initialState: AccountDetails = {
   username: '',
+  email: '',
   password: '',
+  confirmation: '',
 };
 
 const accountSlice = createSlice({
   name: 'login',
   initialState,
   reducers: {
-    updateUsername: (state, action: PayloadAction<string>) => {
-      state.username = action.payload;
-    },
-    updatePassword: (state, action: PayloadAction<string>) => {
-      state.password = action.payload;
+    updateField: (state, action: PayloadAction<FieldUpdate>) => {
+      state[action.payload.name] = action.payload.value;
     },
   },
 });
 
-export const {updatePassword, updateUsername} = accountSlice.actions;
+export const {updateField} = accountSlice.actions;
 export default accountSlice.reducer;

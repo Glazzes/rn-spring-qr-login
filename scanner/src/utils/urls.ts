@@ -4,6 +4,8 @@ export const apiAuthLogin = '/api/v1//auth/login';
 // users
 export const apiUsersUrl = '/api/v1/users';
 export const apiUsersMeUrl = `${apiUsersUrl}/me`;
+export const apiUsersExistsByEmailUrl = `${apiUsersUrl}/exists`;
+export const apiUsersValidateUrl = `${apiUsersUrl}/validate`;
 
 // events
 const apiEvents = '/api/v1/events';

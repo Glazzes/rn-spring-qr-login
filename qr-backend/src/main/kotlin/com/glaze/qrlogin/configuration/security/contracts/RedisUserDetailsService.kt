@@ -1,4 +1,4 @@
-package com.glaze.qrlogin.configuration.shared
+package com.glaze.qrlogin.configuration.security.contracts
 
 import com.glaze.qrlogin.repositories.UserRepository
 import org.springframework.security.core.userdetails.UserDetails
@@ -17,6 +17,7 @@ class RedisUserDetailsService(
 
         return UserToUserDetailsAdapter(user)
     }
+
     fun loadUserById(id: String): UserDetails {
         val user = userRepository.findById(id)
             .orElseThrow { UsernameNotFoundException("Could not find user with id $id") }

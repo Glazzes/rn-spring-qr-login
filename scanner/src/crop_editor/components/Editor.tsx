@@ -35,8 +35,10 @@ import {
 import Svg, {Path} from 'react-native-svg';
 import {set} from '../../utils/animation';
 import {SharedElement} from 'react-navigation-shared-element';
-import { useSelector } from 'react-redux';
-import { RootState } from '../../store/store';
+import {useSelector} from 'react-redux';
+import {RootState} from '../../store/store';
+import {axiosInstance} from '../../utils/axiosInstance';
+import {apiUsersUrl} from '../../utils/urls';
 
 type CropEditorProps = {
   route: RouteProp<StackScreens, 'CropEditor'>;
@@ -58,15 +60,15 @@ const path = [
 ];
 
 const FAB_SIZE = 60;
-const CROP_SIZE = 180;
+const CROP_SIZE = 250;
 const TIMING_CONFIG = {duration: 150};
 
 const CropEditor: React.FC<CropEditorProps> = ({route}) => {
-  const login = useSelector((state: RootState) => state.login);
   const {uri: imagePath, width: imageWidth, height: imageHeight} = route.params;
-
   const navigation =
     useNavigation<NavigationProp<StackScreens, 'CropEditor'>>();
+
+  const account = useSelector((state: RootState) => state.account);
 
   const [isCropping, setIsCropping] = useState<boolean>(false);
   const imageStyle = useMemo(() => {
@@ -113,6 +115,7 @@ const CropEditor: React.FC<CropEditorProps> = ({route}) => {
   }, [translate, scale, bounds]);
 
   const pan = Gesture.Pan()
+    .enabled(!isCropping)
     .maxPointers(1)
     .onStart(_ => {
       offset.x.value = translation.value.x;
@@ -173,6 +176,7 @@ const CropEditor: React.FC<CropEditorProps> = ({route}) => {
     });
 
   const pinchGesture = Gesture.Pinch()
+    .enabled(!isCropping)
     .onBegin(_ => {
       offset.x.value = translation.value.x;
       offset.y.value = translation.value.y;
@@ -233,6 +237,34 @@ const CropEditor: React.FC<CropEditorProps> = ({route}) => {
     };
   });
 
+  const createAccount = (picture: string) => {
+    const request = {
+      username: account.username,
+      password: account.password,
+      email: account.email,
+    };
+
+    const file = {
+      uri: picture,
+      name: 'picture.jpeg',
+      type: 'image/jpeg',
+    };
+
+    const formData = new FormData();
+    formData.append('request', JSON.stringify(request));
+    formData.append('file', file);
+
+    axiosInstance
+      .post(apiUsersUrl, formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data; ',
+        },
+      })
+      .then(() => {
+        navigation.navigate('Login', {createdAccount: true});
+      });
+  };
+
   const cropImage = async () => {
     setIsCropping(true);
     const actions = [];
@@ -279,10 +311,7 @@ const CropEditor: React.FC<CropEditorProps> = ({route}) => {
     );
 
     await impactAsync(ImpactFeedbackStyle.Medium);
-    // emitHideImagePicker();
-    // emitUpdateProfilePicture(uri);
-    setIsCropping(false);
-    navigation.navigate('Login', {createdAccount: true});
+    createAccount(uri);
   };
 
   useAnimatedReaction(
@@ -298,6 +327,7 @@ const CropEditor: React.FC<CropEditorProps> = ({route}) => {
       layout.y.value =
         value % Math.PI === 0 ? original.y.value : original.x.value;
     },
+    [rotateImage],
   );
 
   return (
@@ -327,7 +357,7 @@ const CropEditor: React.FC<CropEditorProps> = ({route}) => {
         style={StyleSheet.absoluteFillObject}
         entering={FadeIn.delay(1000).duration(300)}>
         <Svg style={StyleSheet.absoluteFill}>
-          <Path d={path.join(' ')} fill={'rgba(0, 0, 0, 0.45)'} />
+          <Path d={path.join(' ')} fill={'rgba(0, 0, 0, 0.5)'} />
         </Svg>
       </Animated.View>
       <View style={styles.reflection}>

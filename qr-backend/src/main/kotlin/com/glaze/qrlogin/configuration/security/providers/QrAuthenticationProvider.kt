@@ -1,11 +1,12 @@
-package com.glaze.qrlogin.configuration.qr
+package com.glaze.qrlogin.configuration.security.providers
 
 import com.glaze.qrlogin.exception.QrRequestNotFoundException
 import com.glaze.qrlogin.dtos.request.QrCodeLoginRequest
 import com.glaze.qrlogin.repositories.QrCodeRepository
-import com.glaze.qrlogin.configuration.shared.RedisUserDetailsService
-import com.glaze.qrlogin.configuration.shared.SuccessfulAuthenticationToken
-import com.glaze.qrlogin.configuration.shared.UserToUserDetailsAdapter
+import com.glaze.qrlogin.configuration.security.contracts.RedisUserDetailsService
+import com.glaze.qrlogin.configuration.security.tokens.SuccessfulAuthenticationToken
+import com.glaze.qrlogin.configuration.security.contracts.UserToUserDetailsAdapter
+import com.glaze.qrlogin.configuration.security.tokens.QrAuthenticationToken
 import org.springframework.security.authentication.AuthenticationProvider
 import org.springframework.security.core.Authentication
 

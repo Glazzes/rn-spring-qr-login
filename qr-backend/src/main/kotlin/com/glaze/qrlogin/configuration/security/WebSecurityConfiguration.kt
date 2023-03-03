@@ -1,11 +1,12 @@
-package com.glaze.qrlogin.configuration
+package com.glaze.qrlogin.configuration.security
 
 import com.glaze.qrlogin.repositories.QrCodeRepository
-import com.glaze.qrlogin.configuration.global.GlobalAuthenticationFilter
-import com.glaze.qrlogin.configuration.qr.QrAuthenticationFilter
-import com.glaze.qrlogin.configuration.qr.QrAuthenticationProvider
-import com.glaze.qrlogin.configuration.shared.RedisUserDetailsService
-import com.glaze.qrlogin.configuration.userpass.PasswordAuthenticationFilter
+import com.glaze.qrlogin.configuration.security.filters.GlobalAuthenticationFilter
+import com.glaze.qrlogin.configuration.security.filters.QrAuthenticationFilter
+import com.glaze.qrlogin.configuration.security.providers.QrAuthenticationProvider
+import com.glaze.qrlogin.configuration.security.contracts.RedisUserDetailsService
+import com.glaze.qrlogin.configuration.security.filters.PasswordAuthenticationFilter
+import com.glaze.qrlogin.configuration.security.handlers.CustomLogoutHandler
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
@@ -62,26 +63,37 @@ class WebSecurityConfiguration (
             .sessionManagement { it.sessionCreationPolicy(SessionCreationPolicy.STATELESS) }
             .authorizeHttpRequests {
                 it.requestMatchers(
-                    "/api/v1/qrcode", "/api/v1/users/me", "/api/v1/events/*/user-show",
-                    "/api/v1/events/*/login-cancel", "/api/v1/events/*/login-perform")
-                        .authenticated()
+                    "/api/v1/qrcode",
+                    "/api/v1/users/me",
+                    "/api/v1/events/{id}/display-user",
+                    "/api/v1/events/{id}/login-cancel",
+                    "/api/v1/events/{id}/login-perform"
+                )
+                    .authenticated()
                     .requestMatchers(
-                        "/api/v1/auth/login", "/api/v1/login/qr", "/api/v1/events/*/register",
-                        "/api/v1/events/{id}")
+                        "/static/{filename}",
+                        "/api/v1/users/*",
+                        "/api/v1/auth/login",
+                        "/api/v1/login/qr",
+                        "/api/v1/events/{id}/register",
+                        "/api/v1/events/{id}"
+                    )
                         .permitAll()
-                    .requestMatchers("/api/v1/users").anonymous()
+                    .requestMatchers("/api/v1/users")
+                        .anonymous()
                     .anyRequest()
                         .authenticated()
             }
             .authenticationManager(this.authenticationManager())
             .addFilter(PasswordAuthenticationFilter(authenticationManager()))
             .addFilterAfter(QrAuthenticationFilter(authenticationManager()), PasswordAuthenticationFilter::class.java)
-            .addFilterAfter(
-                GlobalAuthenticationFilter(userDetailsService),
-                QrAuthenticationFilter::class.java
-            )
+            .addFilterAfter(GlobalAuthenticationFilter(userDetailsService), QrAuthenticationFilter::class.java)
             .httpBasic { it.disable() }
             .formLogin { it.disable() }
+            .logout {
+                it.logoutUrl("/api/v1/logout")
+                    .addLogoutHandler(CustomLogoutHandler())
+            }
 
         return http.build()
     }

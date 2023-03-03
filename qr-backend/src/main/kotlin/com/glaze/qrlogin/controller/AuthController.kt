@@ -9,16 +9,14 @@ import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 
 @RestController
-@RequestMapping("/api/v1")
+@RequestMapping("/api/v1/auth")
 class AuthController(private val authService: AuthService){
 
     /*
     Spring security used to not complain of "hidden" endpoints, this one is for spring security
     not to return a 404 status code, as changing it manually has no effect on the response
      */
-
-    @CrossOrigin("http://localhost:19006")
-    @PostMapping(value =  ["/login/qr", "/auth/login"])
+    @PostMapping(value =  ["/login/qr", "/login"])
     fun login() = ResponseEntity.status(HttpStatus.NO_CONTENT)
         .build<Unit>()
 

@@ -14,7 +14,7 @@ class AuthService(private val qrCodeRepository: QrCodeRepository){
         val qrCodeRequest = QrCode(
             issuedFor = authenticatedUser.username,
             mobileId = createQrRequest.mobileId,
-            deviceId = createQrRequest.mobileId,
+            deviceId = createQrRequest.deviceId,
             deviceName = createQrRequest.deviceName,
             os = createQrRequest.os,
             location = createQrRequest.location,

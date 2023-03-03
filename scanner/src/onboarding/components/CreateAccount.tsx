@@ -9,29 +9,23 @@ import {
   ScrollView,
   BackHandler,
 } from 'react-native';
-import React, {useEffect, useRef, useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import Icon from '@expo/vector-icons/Ionicons';
 import {impactAsync, ImpactFeedbackStyle} from 'expo-haptics';
-/*
-import {NotificationType} from '../../enums/notification';
-import {AxiosResponse} from 'axios';
-import {apiUsersExistsUrl, apiUsersUrl} from '../../shared/requests/contants';
-import Button from '../../shared/components/Button';
-import {UserExists} from '../../shared/types';
-import {displayToast, genericErrorMessage} from '../../shared/toast';
-*/
 import Constants from 'expo-constants';
 import withKeyboard from '../../utils/hoc/withKeyboard';
 import {axiosInstance} from '../../utils/axiosInstance';
-import {AxiosResponse} from 'axios';
-import {apiUsersUrl} from '../../utils/urls';
+import {apiUsersExistsByEmailUrl, apiUsersValidateUrl} from '../../utils/urls';
 import Button from '../../utils/components/Button';
 import {NavigationProp} from '@react-navigation/native';
 import {StackScreens} from '../../navigation/stackScreens';
-import {useSharedValue} from 'react-native-reanimated';
+import {useSharedValue, withTiming} from 'react-native-reanimated';
 import ImagePicker from './ImagePicker';
-import {useDispatch} from 'react-redux';
-import {updatePassword, updateUsername} from '../../store/slices/accountSlice';
+import {useDispatch, useSelector} from 'react-redux';
+import {updateField} from '../../store/slices/accountSlice';
+import {AccountCreationFields} from '../../utils/types';
+import {RootState} from '../../store/store';
+import {AxiosError} from 'axios';
 
 const statusBarHeight = Constants.statusBarHeight;
 
@@ -41,6 +35,7 @@ type AccountCreationErrors = {
   username: string | undefined;
   email: string | undefined;
   password: string | undefined;
+  confirmation: string | undefined;
 };
 
 type CreateAccountProps = {
@@ -48,23 +43,25 @@ type CreateAccountProps = {
 };
 
 const CreateAccount: React.FC<CreateAccountProps> = ({navigation}) => {
-  const info = useRef({username: '', password: '', email: ''});
-
   const dispatch = useDispatch();
-  const [isAccountValid, setIsAccountValid] = useState<boolean>(false);
-  const [isSecure, setIsSecure] = useState<boolean>(true);
+  const select = useSelector((state: RootState) => state.account);
+
+  const [isValidating, setIsValidating] = useState<boolean>(false);
+  const [isHiddenPassword, setIsHiddenPassword] = useState<boolean>(true);
+  const [isHiddentConfirmation, setIsHiddentConfirmation] = useState(true);
   const [fieldErrors, setFieldErrors] = useState<AccountCreationErrors>({
     username: undefined,
     email: undefined,
     password: undefined,
+    confirmation: undefined,
   });
   const [timer, setTimer] = useState();
 
-  const translateY = useSharedValue<number>(-1 * height);
+  const translateY = useSharedValue<number>(0);
 
   const toggleIsSecure = async () => {
     await impactAsync(ImpactFeedbackStyle.Light);
-    setIsSecure(s => !s);
+    setIsHiddenPassword(s => !s);
   };
 
   const goBack = () => {
@@ -74,86 +71,86 @@ const CreateAccount: React.FC<CreateAccountProps> = ({navigation}) => {
     }
   };
 
-  const onChangeWithCheck = (text: string, field: 'username' | 'email') => {
-    if (field === 'username') {
-      dispatch(updateUsername(text));
-    }
+  const onChangeText = (text: string, field: AccountCreationFields) => {
+    setFieldErrors(errors => ({...errors, [field]: undefined}));
+    dispatch(updateField({name: field, value: text}));
 
     if (field === 'email') {
-      dispatch(updatePassword(text));
-    }
-
-    info.current[field] = text;
-    setFieldErrors(errors => ({...errors, [field]: undefined}));
-
-    if (timer) {
-      clearTimeout(timer);
-    }
-
-    const newTimer = setTimeout(async () => {
-      try {
-        const {data} = await axiosInstance.get<boolean>('', {
-          params: {
-            username: text.toLocaleLowerCase(),
-            email: text.toLocaleLowerCase(),
-          },
-        });
-
-        setFieldErrors(err => {
-          if (data) {
-            err.email = '* An account is already registered with this email';
-          }
-
-          return {...err};
-        });
-      } catch (e) {}
-    }, 1000);
-
-    setTimer(newTimer);
-  };
-
-  const onChangeText = (text: string, field: 'username' | 'password') => {
-    info.current[field] = text;
-    setFieldErrors(err => ({...err, [field]: undefined}));
-  };
-
-  const createAccount = async () => {
-    try {
-      await axiosInstance.post(apiUsersUrl, info.current);
-
-      /*
-      displayToast({
-        title: 'Account created',
-        message:
-          'Your account has been created successfuly, you can now login!',
-        type: NotificationType.SUCCESS,
-      })
-      */
-
-      // Navigation.pop(componentId);
-    } catch ({response}) {
-      const res = response as AxiosResponse;
-      if (res.status === 400) {
-        setFieldErrors(err => ({...err, ...res.data}));
-        return;
+      if (timer) {
+        clearTimeout(timer);
       }
 
-      // displayToast(genericErrorMessage);
+      const newTimer = setTimeout(async () => {
+        try {
+          const {data} = await axiosInstance.get<boolean>(
+            apiUsersExistsByEmailUrl,
+            {
+              params: {
+                email: text.toLocaleLowerCase(),
+              },
+            },
+          );
+
+          setFieldErrors(err => {
+            if (data) {
+              err.email = '* An account is already registered with this email';
+            }
+
+            return {...err};
+          });
+        } catch (e) {}
+      }, 650);
+
+      // @ts-ignore
+      setTimer(newTimer);
     }
+  };
+
+  const validateAccountDetails = async () => {
+    if (select.password !== select.confirmation) {
+      setFieldErrors(err => {
+        err.confirmation = '* Passwords do not match';
+        return {...err};
+      });
+
+      return;
+    }
+
+    setIsValidating(true);
+
+    const body = {
+      username: select.username,
+      password: select.password,
+      email: select.email,
+    };
+
+    axiosInstance
+      .post(apiUsersValidateUrl, body)
+      .then(() => {
+        translateY.value = withTiming(-1 * height);
+        setIsValidating(false);
+      })
+      .catch((e: AxiosError) => {
+        const errors = e.response?.data as AccountCreationErrors;
+        delete errors.confirmation;
+
+        setFieldErrors(err => ({...err, errors}));
+        setIsValidating(false);
+      });
   };
 
   useEffect(() => {
     const subscription = BackHandler.addEventListener(
       'hardwareBackPress',
       () => {
-        return !isAccountValid;
+        return translateY.value < 0;
       },
     );
 
     return () => {
       subscription.remove();
     };
-  }, [isAccountValid]);
+  }, [translateY]);
 
   return (
     <View style={styles.root}>
@@ -182,7 +179,7 @@ const CreateAccount: React.FC<CreateAccountProps> = ({navigation}) => {
             <TextInput
               style={styles.textInput}
               placeholder={'Email'}
-              onChangeText={text => onChangeWithCheck(text, 'email')}
+              onChangeText={text => onChangeText(text, 'email')}
               autoCapitalize={'none'}
             />
           </View>
@@ -202,7 +199,7 @@ const CreateAccount: React.FC<CreateAccountProps> = ({navigation}) => {
             <TextInput
               style={styles.textInput}
               placeholder={'Username'}
-              onChangeText={text => onChangeWithCheck(text, 'username')}
+              onChangeText={text => onChangeText(text, 'username')}
               autoCapitalize={'none'}
             />
           </View>
@@ -221,13 +218,13 @@ const CreateAccount: React.FC<CreateAccountProps> = ({navigation}) => {
           <TextInput
             style={styles.textInput}
             placeholder={'Password'}
-            secureTextEntry={isSecure}
+            secureTextEntry={isHiddenPassword}
             onChangeText={text => onChangeText(text, 'password')}
             autoCapitalize={'none'}
           />
           <Pressable onPress={toggleIsSecure} hitSlop={40}>
             <Icon
-              name={isSecure ? 'eye' : 'eye-off'}
+              name={isHiddenPassword ? 'eye' : 'eye-off'}
               size={22}
               color={'#9E9EA7'}
             />
@@ -235,6 +232,34 @@ const CreateAccount: React.FC<CreateAccountProps> = ({navigation}) => {
         </View>
         {fieldErrors.password && (
           <Text style={styles.error}>{fieldErrors.password}</Text>
+        )}
+
+        <View style={styles.textInputContainer}>
+          <Icon
+            name={'ios-lock-closed'}
+            size={22}
+            color={'#9E9EA7'}
+            style={styles.icon}
+          />
+          <TextInput
+            style={styles.textInput}
+            placeholder={'Confirm your password'}
+            secureTextEntry={isHiddentConfirmation}
+            onChangeText={text => onChangeText(text, 'confirmation')}
+            autoCapitalize={'none'}
+          />
+          <Pressable
+            onPress={() => setIsHiddentConfirmation(s => !s)}
+            hitSlop={40}>
+            <Icon
+              name={isHiddentConfirmation ? 'eye' : 'eye-off'}
+              size={22}
+              color={'#9E9EA7'}
+            />
+          </Pressable>
+        </View>
+        {fieldErrors.confirmation && (
+          <Text style={styles.error}>{fieldErrors.confirmation}</Text>
         )}
 
         <View style={styles.buttonContainer}>
@@ -247,12 +272,14 @@ const CreateAccount: React.FC<CreateAccountProps> = ({navigation}) => {
           <Button
             text="Confirm"
             disabled={
-              (fieldErrors.username ||
+              isValidating ||
+              ((fieldErrors.username ||
                 fieldErrors.email ||
-                fieldErrors.password) as unknown as boolean
+                fieldErrors.password ||
+                fieldErrors.confirmation) as unknown as boolean)
             }
             width={width * 0.9}
-            onPress={createAccount}
+            onPress={validateAccountDetails}
             extraStyle={styles.buttonMargin}
           />
 
@@ -274,10 +301,11 @@ const styles = StyleSheet.create({
   root: {
     flex: 1,
     backgroundColor: '#fff',
-    paddingHorizontal: width * 0.05,
+    // paddingHorizontal: width * 0.05,
   },
   content: {
     paddingBottom: statusBarHeight,
+    paddingHorizontal: width * 0.05,
   },
   topbar: {
     width,

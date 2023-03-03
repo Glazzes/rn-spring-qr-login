@@ -1,4 +1,3 @@
-import 'react-native-reanimated';
 import React from 'react';
 import {NavigationContainer} from '@react-navigation/native';
 import {Home} from './src/home';
@@ -15,7 +14,6 @@ import {createSharedElementStackNavigator} from 'react-navigation-shared-element
 import {CropEditor} from './src/crop_editor';
 import {Provider} from 'react-redux';
 import {store} from './src/store/store';
-import Modal from './src/utils/components/Modal';
 
 LogBox.ignoreLogs(['[react-native-gesture-handler]']);
 
@@ -35,15 +33,9 @@ const App: React.FC = () => {
                 headerShown: false,
               }}>
               <Stack.Screen
-                name="Modal"
-                component={Modal}
-                options={{presentation: 'transparentModal'}}
-              />
-
-              <Stack.Screen
                 name={'Login'}
                 component={Login}
-                initialParams={{createdAccount: true}}
+                initialParams={{createdAccount: false}}
               />
               <Stack.Screen name={'CreateAccount'} component={CreateAccount} />
               <Stack.Screen

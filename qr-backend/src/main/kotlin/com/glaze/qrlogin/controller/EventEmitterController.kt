@@ -34,7 +34,7 @@ class EventEmitterController(
         return emitter
     }
 
-    @PostMapping(path = ["/{id}/user-show"])
+    @PostMapping(path = ["/{id}/display-user"])
     fun sendUserShowEvent(@PathVariable id:String): ResponseEntity<Unit> {
         val emitter = eventEmitters.get(id) ?:
             return ResponseEntity.status(HttpStatus.NOT_FOUND)

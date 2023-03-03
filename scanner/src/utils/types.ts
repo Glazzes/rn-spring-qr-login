@@ -3,6 +3,12 @@ export type Vector<T> = {
   y: T;
 };
 
+export type AccountCreationFields =
+  | 'username'
+  | 'password'
+  | 'email'
+  | 'confirmation';
+
 export type User = {
   id: string;
   username: string;

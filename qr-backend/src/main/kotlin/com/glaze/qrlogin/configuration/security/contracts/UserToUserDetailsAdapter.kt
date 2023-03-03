@@ -1,4 +1,4 @@
-package com.glaze.qrlogin.configuration.shared
+package com.glaze.qrlogin.configuration.security.contracts
 
 import com.glaze.qrlogin.entities.User
 import org.springframework.security.core.GrantedAuthority

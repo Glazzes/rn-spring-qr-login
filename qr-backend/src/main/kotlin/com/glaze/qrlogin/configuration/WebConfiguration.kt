@@ -13,6 +13,7 @@ class WebConfiguration {
 
     @Bean
     fun stringToSignUpRequestConverter(): Converter<String, SignUpRequest> {
+        // Spring fails to execute this bean when expressed as IntelliJ suggests
         return object : Converter<String, SignUpRequest> {
             override fun convert(value: String): SignUpRequest {
                 return mapper.readValue(value, SignUpRequest::class.java)

@@ -4,7 +4,6 @@ import {
   Alert,
   View,
   Text,
-  FlatList,
   ListRenderItemInfo,
 } from 'react-native';
 import React, {useEffect, useState} from 'react';
@@ -149,7 +148,6 @@ const ImagePicker: React.FC<ImagePickerProps> = ({translateY}) => {
 const styles = StyleSheet.create({
   rootContainer: {
     position: 'absolute',
-    backgroundColor: 'orange',
     width,
     height: height - Constants.statusBarHeight,
   },

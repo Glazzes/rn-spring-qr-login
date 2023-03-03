@@ -4,6 +4,7 @@ import com.glaze.qrlogin.entities.User
 import com.glaze.qrlogin.dtos.response.UserDTO
 import com.glaze.qrlogin.dtos.request.SignUpRequest
 import com.glaze.qrlogin.repositories.UserRepository
+import com.glaze.qrlogin.utils.FileUtil
 import com.glaze.qrlogin.utils.SecurityUtil
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.stereotype.Service
@@ -11,6 +12,7 @@ import org.springframework.validation.BindException
 import org.springframework.validation.FieldError
 import org.springframework.validation.MapBindingResult
 import jakarta.validation.Validator
+import org.springframework.web.multipart.MultipartFile
 import kotlin.jvm.Throws
 
 @Service
@@ -20,16 +22,16 @@ class UserService(
     private val passwordEncoder: PasswordEncoder
 ){
 
-    private val defaultPic = "https://randomuser.me/api/portraits/men/15.jpg"
-
-    fun save(request: SignUpRequest): UserDTO {
+    fun save(request: SignUpRequest, picture: MultipartFile): UserDTO {
         validate(request)
 
+        val profilePictureId = FileUtil.save(picture)
         val userEntity = User(
             username = request.username,
             password = passwordEncoder.encode(request.password),
             email = request.email,
-            profilePicture = defaultPic)
+            profilePicture = profilePictureId
+        )
 
         val savedUser = userRepository.save(userEntity)
         return UserDTO(savedUser.id, savedUser.username, savedUser.profilePicture)
