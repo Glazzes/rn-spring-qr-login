@@ -11,9 +11,9 @@ class RedisUserDetailsService(
     private val userRepository: UserRepository
 ): UserDetailsService {
 
-    override fun loadUserByUsername(username: String): UserDetails {
-        val user = userRepository.findByUsername(username) ?:
-            throw UsernameNotFoundException("Could not find user with username $username")
+    override fun loadUserByUsername(email: String): UserDetails {
+        val user = userRepository.findByEmail(email) ?:
+            throw UsernameNotFoundException("Could not find user with email $email")
 
         return UserToUserDetailsAdapter(user)
     }

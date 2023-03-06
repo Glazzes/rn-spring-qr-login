@@ -10,14 +10,22 @@ object JwtUtil {
     fun createToken(subject: String, time: Long, unit: ChronoUnit): String {
         val issuedAt = Instant.now()
         val expiration = Instant.now()
-            .plus(15L, ChronoUnit.MINUTES)
+            .plus(time, unit)
 
         return Jwts.builder()
             .setSubject(subject)
-            .setExpiration(Date.from(expiration))
             .setIssuedAt(Date.from(issuedAt))
+            .setExpiration(Date.from(expiration))
             .setIssuer("Kio")
             .compact()
+    }
+
+    fun getSubjectFromToken(token: String): String {
+        return Jwts.parserBuilder()
+            .build()
+            .parseClaimsJwt(token)
+            .body
+            .subject
     }
 
 }

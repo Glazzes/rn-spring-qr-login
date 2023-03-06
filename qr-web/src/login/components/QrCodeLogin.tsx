@@ -15,7 +15,7 @@ import {QRCodeSVG} from 'qrcode.react';
 import {v4 as uuid} from 'uuid';
 import axios from 'axios';
 import {QrCode, User} from '../../utils/types';
-import {deleteEventUrl, getEventSourceUrl, qrLogin} from '../../utils/urls';
+import {getEventSourceUrl, getProfilePictureUrl, qrLogin} from '../../utils/urls';
 import {SIZE} from '../../utils/contants';
 import {setAccessToken} from '../../utils/authStore';
 import {Events} from '../../utils/enums';
@@ -30,11 +30,11 @@ const EMPTY_USER = {
 }
 
 const QrCodeLogin: React.FC = () => {
-  const [displayCode, setDisplayCode] = useState<boolean>(false);
+  const elapsedTime = useRef<number>(0);
+
+  const [displayCode, setDisplayCode] = useState<boolean>(true);
   const [user, setUser] = useState<User>(EMPTY_USER);
   const [textTime, setTextTime] = useState<string>('10:00');
-  const [time, setTime] = useState<number>(0);
-  const [countdown, setCountdown] = useState<NodeJS.Timer | undefined>();
 
   const [eventSource, setEventSource] = useState(() => {
     const url = getEventSourceUrl(deviceId);
@@ -56,34 +56,48 @@ const QrCodeLogin: React.FC = () => {
     }
   });
 
-  const translateX = useRef(new Animated.Value(-1 * SIZE)).current;
+  const translateX = useRef(new Animated.Value(0)).current;
   const translateContainer = (toValue: number) => {
     Animated.timing(translateX, {toValue, duration: 300, useNativeDriver: false}).start();
   };
 
   const displayCurrentUser = (e: {data: string}) => {
     const user = JSON.parse(e.data) as User;
+    user.profilePicture = getProfilePictureUrl(user.profilePicture);
     setUser(user);
     setQrCode((qr) => ({...qr, issuedFor: user.id, mobileId: 'some-mobile-id'}));
-    translateContainer(-SIZE);
+    translateContainer(-1 * SIZE);
 
-    setCountdown(() => {
-      return setInterval(() => setTime(t => t + 1), 1000);
-    });
+    const interval = setInterval(() => {
+      elapsedTime.current += 1;
+      if(elapsedTime.current > COUNNTDOWN_SECONDS) {
+        elapsedTime.current = 0;
+        clearInterval(interval)
+        setToBaseState();
+        return;
+      }
+
+      const acutalTime = COUNNTDOWN_SECONDS - elapsedTime.current;
+      const minutes = Math.floor(acutalTime / 60);
+      const seconds = acutalTime % 60;
+
+      setTextTime(`${minutes}: ${seconds > 9 ? seconds : '0' + seconds}`)
+    }, 1000)
   }
 
   const login = () => {
     axios
-      .post(qrLogin, qrCode)
-      .then((res) => {
-        const token = res.headers['authorization'];
+      .post(qrLogin, qrCode, {withCredentials: false})
+      .then(response => {
+        const token = response.headers['authorization'];
+        console.log(response.headers)
         if (token) {
           setAccessToken(token);
         } else {
           Alert.alert('Login successfull but no access token was present');
         }
       })
-      .catch((e) => console.log(e.response));
+      .catch((e) => console.log(e, 'fail'));
   }
 
   const setToBaseState = () => {
@@ -93,15 +107,10 @@ const QrCodeLogin: React.FC = () => {
     setUser(EMPTY_USER);
     translateContainer(0);
     setQrCode(qr => ({...qr, deviceId: newId, issuedFor: '', mobileId: ''}));
-
-    if(countdown) {
-      clearInterval(countdown);
-    }
-    setCountdown(undefined);
-    setTime(0);
     setTextTime('10:00');
+    elapsedTime.current = 0;
 
-    const newUrl = getEventSourceUrl(deviceId);
+    const newUrl = getEventSourceUrl(newId);
     setEventSource(new EventSource(newUrl));
 
     translateContainer(0);
@@ -109,47 +118,21 @@ const QrCodeLogin: React.FC = () => {
     const timeout = setTimeout(() => {
       setDisplayCode(true);
       clearTimeout(timeout);
-    }, 1500)
+    }, 1000)
   }
-
-  const deleteEvetSoruce = async () => {
-    const res = await fetch(deleteEventUrl(qrCode.deviceId), {method: 'DELETE'});
-    if (res.status === 204) {
-      console.log('source deleted');
-      return;
-    }
-
-    if (res.status === 404) {
-      console.log('source not found');
-      return;
-    }
-  };
 
   useEffect(() => {
     eventSource.addEventListener(Events.DISPLAY_USER, displayCurrentUser);
-    eventSource.addEventListener(Events.LOGIN_PERFORM, login);
-    eventSource.addEventListener(Events.LOGIN_CANCEL, setToBaseState);
+    eventSource.addEventListener(Events.PERFORM_LOGIN, login);
+    eventSource.addEventListener(Events.CANCEL_LOGIN, setToBaseState);
 
     return () => {
       eventSource.removeEventListener(Events.DISPLAY_USER, displayCurrentUser);
-      eventSource.removeEventListener(Events.LOGIN_PERFORM, login);
-      eventSource.removeEventListener(Events.LOGIN_CANCEL, setToBaseState);
+      eventSource.removeEventListener(Events.PERFORM_LOGIN, login);
+      eventSource.removeEventListener(Events.CANCEL_LOGIN, setToBaseState);
       eventSource.close();
     }
   }, [eventSource]);
-
-  useEffect(() => {
-    const actualTime = COUNNTDOWN_SECONDS - time;
-    const minutes = Math.floor(actualTime / 60);
-    const seconds = actualTime % 60;
-
-    setTextTime(`${minutes}: ${seconds >= 10 ? seconds : '0' + seconds}`);
-
-    if(actualTime <= 0) {
-      setToBaseState();
-    }
-
-  }, [time, countdown]);
 
   useEffect(() => {
     axios
@@ -177,9 +160,9 @@ const QrCodeLogin: React.FC = () => {
               includeMargin={true}
               fgColor={'#2C3639'}
               imageSettings={{
-                'src': require('../../../assets/react.png'),
-                height: 50,
-                width: 50,
+                src: require('../../../assets/react.png'),
+                height: 60,
+                width: 60,
                 excavate: false
               }}
             />
@@ -193,9 +176,7 @@ const QrCodeLogin: React.FC = () => {
 
         <View style={styles.infoContainer}>
           <Image
-            source={{
-              uri: 'https://www.purina.co.uk/sites/default/files/styles/square_medium_440x440/public/2022-07/Dalmatian1.jpg?h=d8db1d25&itok=f_I43-vM',
-            }}
+            source={{uri: user.profilePicture}}
             resizeMode={'cover'}
             style={styles.picture}
           />

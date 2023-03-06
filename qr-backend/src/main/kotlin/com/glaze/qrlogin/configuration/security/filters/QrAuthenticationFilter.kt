@@ -50,9 +50,8 @@ class QrAuthenticationFilter(
         SecurityContextHolder.getContext().authentication = successfulAuthenticationToken
 
         response.status = HttpStatus.NO_CONTENT.value()
-        response.addHeader("Authorization", "Bearer $accessToken")
-        response.addHeader("Refresh-Token", refreshToken)
-        response.addHeader("Access-Control-Expose-Headers", "Authorization, RefreshToken")
+        response.setHeader("Authorization", accessToken)
+        response.setHeader("Refresh-Token", refreshToken)
 
         chain.doFilter(request, response)
     }

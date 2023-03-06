@@ -2,13 +2,12 @@ import {Dimensions, Alert} from 'react-native';
 import React from 'react';
 import {Text, Box, Image, VStack, Button} from 'native-base';
 import {NavigationProp, RouteProp} from '@react-navigation/native';
-import axios from 'axios';
-import {useSnapshot} from 'valtio';
 import {Information} from '../utils/types';
 import {StackScreens} from '../navigation/stackScreens';
-import {authState} from '../store/authStore';
 import {qrCancelLoginEventUrl, qrLoginPerformEventUrl} from '../utils/urls';
 import Info from './Info';
+import {axiosInstance} from '../utils/axiosInstance';
+import {AxiosError} from 'axios';
 
 const {width, height} = Dimensions.get('window');
 const found = require('../assets/found.png');
@@ -37,53 +36,44 @@ const DeviceInformation: React.FC<DeviceInformationProps> = ({
   navigation,
   route,
 }) => {
-  const state = useSnapshot(authState);
+  const login = async () => {
+    try {
+      const url = qrLoginPerformEventUrl(route.params.id);
+      await axiosInstance.post(url, undefined);
 
-  const login = () => {
-    const config = {headers: {Authorization: state.accessToken}};
-
-    axios
-      .post(
-        qrLoginPerformEventUrl(route.params.id),
-        route.params.qrCode,
-        config,
-      )
-      .then(() => {
-        navigation.navigate('ScanResult', {
-          information: paths.success,
-        });
-      })
-      .catch(e => {
-        if (e.response.status === 404) {
-          navigation.navigate('ScanResult', {
-            information: paths.notFound,
-          });
-        }
-
-        if (e.response.status === 500) {
-          Alert.alert('There was a problem while logging in');
-        }
+      navigation.navigate('ScanResult', {
+        information: paths.success,
       });
+    } catch (e) {
+      const response = (e as AxiosError).response;
+      if (response?.status === 404) {
+        navigation.navigate('ScanResult', {
+          information: paths.notFound,
+        });
+
+        return;
+      }
+
+      if (response?.status !== 404) {
+        Alert.alert('There was a problem while logging in');
+      }
+    }
   };
 
   const cancelLogin = async () => {
-    const config = {headers: {Authorization: state.accessToken}};
-
     try {
-      await axios.post(
-        qrCancelLoginEventUrl(route.params.id),
-        undefined,
-        config,
-      );
+      const url = qrCancelLoginEventUrl(route.params.id);
+      await axiosInstance.post(url, undefined);
 
       navigation.navigate('Home');
     } catch (e) {
-      if (e.response.status === 500) {
-        Alert.alert('Error sending signal to devide');
+      const response = (e as AxiosError).response;
+      if (response?.status === 404) {
+        navigation.navigate('Home');
       }
 
-      if (e.response.status === 404) {
-        navigation.navigate('Home');
+      if (response?.status !== 500) {
+        Alert.alert('Error sending signal to your device');
       }
     }
   };

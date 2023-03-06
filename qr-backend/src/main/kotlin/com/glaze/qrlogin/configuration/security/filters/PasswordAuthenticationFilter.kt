@@ -27,7 +27,7 @@ class PasswordAuthenticationFilter(
 
     override fun attemptAuthentication(request: HttpServletRequest, response: HttpServletResponse): Authentication {
         val loginRequest = objectMapper.readValue(request.inputStream, LoginRequest::class.java)
-        val authentication = UsernamePasswordAuthenticationToken(loginRequest.username, loginRequest.password)
+        val authentication = UsernamePasswordAuthenticationToken(loginRequest.email, loginRequest.password)
 
         return this.authenticationManager
             .authenticate(authentication)
@@ -49,9 +49,8 @@ class PasswordAuthenticationFilter(
         val refreshToken = JwtUtil.createToken(principal.user.email, 7L, ChronoUnit.DAYS)
 
         response.status = HttpStatus.NO_CONTENT.value()
-        response.addHeader("Authorization", "Bearer $accessToken")
-        response.addHeader("Refresh-Token", refreshToken)
-        response.addHeader("Access-Control-Expose-Headers", "Authorization, RefreshToken")
+        response.setHeader("Authorization", accessToken)
+        response.setHeader("Refresh-Token", refreshToken)
 
         chain.doFilter(request, response)
     }

@@ -15,12 +15,17 @@ import RNBootSplash from 'react-native-bootsplash';
 import {NavigationProp, RouteProp} from '@react-navigation/native';
 import {StackScreens} from '../../navigation/stackScreens';
 import withKeyboard from '../../utils/hoc/withKeyboard';
-import {mmkv} from '../../utils/mmkv';
-import {User, UsernamePasswordLogin, TokenResponse} from '../../utils/types';
+import {EmailPasswordLogin} from '../../utils/types';
 import Button from '../../utils/components/Button';
-import {apiAuthLogin, apiUsersMeUrl} from '../../utils/urls';
+import {apiAuthLogin} from '../../utils/urls';
 import {axiosInstance} from '../../utils/axiosInstance';
 import Toast from '../../misc/Toast';
+import {useDispatch} from 'react-redux';
+import {
+  setAuthenticationTokens,
+  setIsAuthenticated,
+} from '../../store/slices/authSlice';
+import {mmkv} from '../../utils/mmkv';
 
 const {width} = Dimensions.get('window');
 
@@ -30,7 +35,9 @@ type LoginProps = {
 };
 
 const Login: React.FC<LoginProps> = ({route, navigation}) => {
-  const login = useRef<UsernamePasswordLogin>({username: '', password: ''});
+  const dispatch = useDispatch();
+
+  const login = useRef<EmailPasswordLogin>({email: '', password: ''});
   const [isSecure, setisSecure] = useState<boolean>(true);
 
   const toggleIsSecure = async () => {
@@ -40,7 +47,7 @@ const Login: React.FC<LoginProps> = ({route, navigation}) => {
 
   const onChangeText = (text: string, type: 'username' | 'password') => {
     if (type === 'username') {
-      login.current.username = text;
+      login.current.email = text;
     }
 
     if (type === 'password') {
@@ -49,19 +56,17 @@ const Login: React.FC<LoginProps> = ({route, navigation}) => {
   };
 
   const signIn = async () => {
-    navigation.navigate('Modal');
     try {
-      const {data} = await axiosInstance.post<TokenResponse>(
-        apiAuthLogin,
-        login.current,
-      );
+      const response = await axiosInstance.post(apiAuthLogin, login.current);
+      const accessToken = response.headers.authorization;
+      const refreshToken = response.headers['refresh-token'];
 
-      // authState.tokens = data;
-      mmkv.set('tokens', JSON.stringify(data));
-
-      const {data: user} = await axiosInstance.get<User>(apiUsersMeUrl);
-      // authState.user = user;
-    } catch (e) {}
+      mmkv.set('tokens', JSON.stringify({accessToken, refreshToken}));
+      dispatch(setAuthenticationTokens({accessToken, refreshToken}));
+      dispatch(setIsAuthenticated(true));
+    } catch (e) {
+      console.log(e);
+    }
   };
 
   const pushToCreateAccount = () => {
@@ -70,12 +75,6 @@ const Login: React.FC<LoginProps> = ({route, navigation}) => {
 
   useEffect(() => {
     RNBootSplash.hide({fade: true});
-  }, []);
-
-  useEffect(() => {
-    if (route.params.createdAccount) {
-      console.log('An account was created');
-    }
   }, []);
 
   return (
@@ -96,7 +95,7 @@ const Login: React.FC<LoginProps> = ({route, navigation}) => {
             />
             <TextInput
               style={styles.textInput}
-              placeholder={'Email / Username'}
+              placeholder={'Email'}
               onChangeText={t => onChangeText(t, 'username')}
               autoCapitalize={'none'}
             />
@@ -194,7 +193,7 @@ const styles = StyleSheet.create({
   textInput: {
     flex: 1,
     height: 45,
-    fontFamily: 'Uber',
+    fontFamily: 'UberBold',
     backgroundColor: '#F3F3F4',
     color: '#C5C8D7',
   },

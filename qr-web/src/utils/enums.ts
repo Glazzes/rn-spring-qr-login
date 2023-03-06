@@ -1,5 +1,5 @@
 export enum Events {
-  DISPLAY_USER = "display.user",
-  LOGIN_CANCEL = "login.cancel",
-  LOGIN_PERFORM = "login.perform",
+  DISPLAY_USER = 'display.user',
+  CANCEL_LOGIN = 'cancel.login',
+  PERFORM_LOGIN = 'perform.login',
 }

@@ -1,8 +1,6 @@
 import {Information, QrCode} from '../utils/types';
 
 export type StackScreens = {
-  Modal: undefined;
-
   Login: {
     createdAccount: boolean;
   };

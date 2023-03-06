@@ -1,17 +1,30 @@
 import React from 'react';
-import {Button, Center, View} from 'native-base';
+import {Center, View} from 'native-base';
 import Appbar from './Appbar';
-import {StatusBar, StyleSheet} from 'react-native';
+import {Dimensions, StatusBar, StyleSheet} from 'react-native';
 import {NavigationProp} from '@react-navigation/native';
 import {StackScreens} from '../navigation/stackScreens';
+import Button from '../utils/components/Button';
+import {mmkv} from '../utils/mmkv';
+import {useDispatch} from 'react-redux';
+import {setIsAuthenticated} from '../store/slices/authSlice';
+
+const {width} = Dimensions.get('window');
 
 type HomeProps = {
   navigation: NavigationProp<StackScreens, 'Home'>;
 };
 
 const Home: React.FC<HomeProps> = ({navigation}) => {
-  const toWarning = () => {
+  const dispatch = useDispatch();
+
+  const toWarning = async () => {
     navigation.navigate('Warning');
+  };
+
+  const logout = async () => {
+    mmkv.delete('tokens');
+    dispatch(setIsAuthenticated(true));
   };
 
   return (
@@ -23,12 +36,11 @@ const Home: React.FC<HomeProps> = ({navigation}) => {
       <Appbar />
       <Center flex={1}>
         <Button
-          bgColor={'#1d1d1d'}
-          rounded={'md'}
-          fontWeight={'bold'}
-          onPress={() => toWarning()}>
-          Login with QR
-        </Button>
+          text={'Login with QR code'}
+          onPress={toWarning}
+          width={width * 0.5}
+        />
+        <Button text={'Logout'} onPress={logout} width={width * 0.5} />
       </Center>
     </View>
   );

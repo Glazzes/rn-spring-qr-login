@@ -12,6 +12,7 @@ export type AccountCreationFields =
 export type User = {
   id: string;
   username: string;
+  email: string;
   profilePicture: string;
 };
 
@@ -30,8 +31,8 @@ export type Information = {
   info: string;
 };
 
-export type UsernamePasswordLogin = {
-  username: string;
+export type EmailPasswordLogin = {
+  email: string;
   password: string;
 };
 

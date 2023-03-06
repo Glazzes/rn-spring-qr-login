@@ -5,15 +5,16 @@ import {BarcodeFormat, useScanBarcodes} from 'vision-camera-code-scanner';
 import {NavigationProp, useNavigation} from '@react-navigation/native';
 import {StackScreens} from '../navigation/stackScreens';
 import {QrCode} from '../utils/types';
-import {useSnapshot} from 'valtio';
-import {authState} from '../store/authStore';
-import axios from 'axios';
-import {saveQrCodeUrl, userShowEventUrl} from '../utils/urls';
+import {apiSaveQRCodeUrl, displayUserEventUrl} from '../utils/urls';
+import {axiosInstance} from '../utils/axiosInstance';
+import uuid from 'react-native-uuid';
+import {useSelector} from 'react-redux';
+import {RootState} from '../store/store';
 
 const {width, height} = Dimensions.get('window');
 
 const Camera: React.FC = () => {
-  const state = useSnapshot(authState);
+  const selector = useSelector((state: RootState) => state);
   const navigation = useNavigation<NavigationProp<StackScreens, 'Scanner'>>();
 
   const scanning = useRef(false);
@@ -26,13 +27,10 @@ const Camera: React.FC = () => {
 
   const saveQrCode = async (qrCode: QrCode) => {
     try {
-      const headers = {Authorization: state.accessToken};
-      const {data} = await axios.post(saveQrCodeUrl, qrCode, {headers});
-      console.log(data);
+      await axiosInstance.post(apiSaveQRCodeUrl, qrCode);
 
-      await axios.post(userShowEventUrl(qrCode.deviceId), undefined, {
-        headers,
-      });
+      const url = displayUserEventUrl(qrCode.deviceId);
+      await axiosInstance.post(url);
 
       navigation.navigate('DeviceInformation', {
         ipAddress: qrCode.ipAddress,
@@ -42,7 +40,9 @@ const Camera: React.FC = () => {
         qrCode,
       });
     } catch (e) {
-      console.warn(e);
+      console.log(e);
+    } finally {
+      scanning.current = false;
     }
   };
 
@@ -50,22 +50,24 @@ const Camera: React.FC = () => {
     if (codes[0] !== undefined && !scanning.current) {
       scanning.current = true;
       try {
-        const qrCode: QrCode = JSON.parse(codes[0].content.data as string);
+        // @ts-ignore
+        const qrCode = JSON.parse(codes[0].content.data);
+
         if (qrCode.issuedFor !== '' || qrCode.mobileId !== '') {
-          Alert.alert('This code is already signed, reload the we page');
+          Alert.alert('This code is already signed, reload the web page');
           return;
         }
 
-        qrCode.issuedFor = state.user.id;
-        qrCode.mobileId = 'some-mobile-id';
-
-        console.log(qrCode);
+        qrCode.issuedFor = selector.auth.user.id;
+        qrCode.mobileId = uuid.v4();
 
         saveQrCode(qrCode);
       } catch (e) {
-        Alert.alert('This is not one of our qr codes');
-      } finally {
-        scanning.current = false;
+        console.log(e);
+
+        Alert.alert(
+          'The code you just scanned is not a code accepted by this app',
+        );
       }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps

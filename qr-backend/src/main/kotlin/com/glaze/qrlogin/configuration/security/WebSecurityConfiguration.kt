@@ -52,8 +52,9 @@ class WebSecurityConfiguration (
             configuration.allowedMethods = listOf("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS", "HEAD")
             configuration.allowCredentials = true
             configuration.maxAge = 60 * 60 * 1000
-            configuration.allowedOrigins = listOf(origin)
-            configuration.allowedHeaders = listOf("*")
+            configuration.allowedOrigins = listOf("http://localhost:19006", "http://192.168.100.4:19006")
+            configuration.exposedHeaders = listOf("Authorization", "Refresh-Token")
+            configuration.allowedHeaders = listOf("Authorization", "Refresh-Token")
 
             val source = UrlBasedCorsConfigurationSource()
             source.registerCorsConfiguration("/**", configuration)
@@ -72,15 +73,12 @@ class WebSecurityConfiguration (
                     .authenticated()
                     .requestMatchers(
                         "/static/{filename}",
-                        "/api/v1/users/*",
-                        "/api/v1/auth/login",
-                        "/api/v1/login/qr",
+                        "/api/v1/users",
+                        "/api/v1/users/validate",
+                        "/api/v1/auth/*",
                         "/api/v1/events/{id}/register",
-                        "/api/v1/events/{id}"
                     )
                         .permitAll()
-                    .requestMatchers("/api/v1/users")
-                        .anonymous()
                     .anyRequest()
                         .authenticated()
             }

@@ -61,18 +61,7 @@ class EventEmitterController(
         return ResponseEntity.status(HttpStatus.NOT_FOUND)
             .build()
 
-        eventEmitterService.sendPerfromLoginEvent(emitter)
-        return ResponseEntity.status(HttpStatus.NO_CONTENT)
-            .build()
-    }
-
-    @DeleteMapping(path = ["/{id}"])
-    fun delete(@PathVariable id: String): ResponseEntity<Unit> {
-        eventEmitters.get(id) ?:
-            return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                .build()
-
-        eventEmitters.remove(id)
+        eventEmitterService.sendPerformLoginEvent(emitter)
         return ResponseEntity.status(HttpStatus.NO_CONTENT)
             .build()
     }

@@ -2,9 +2,12 @@ package com.glaze.qrlogin.service
 
 import com.glaze.qrlogin.entities.QrCode
 import com.glaze.qrlogin.dtos.request.QrCodeLoginRequest
+import com.glaze.qrlogin.dtos.response.TokenResponseDTO
 import com.glaze.qrlogin.repositories.QrCodeRepository
+import com.glaze.qrlogin.utils.JwtUtil
 import com.glaze.qrlogin.utils.SecurityUtil
 import org.springframework.stereotype.Service
+import java.time.temporal.ChronoUnit
 
 @Service
 class AuthService(private val qrCodeRepository: QrCodeRepository){
@@ -22,6 +25,13 @@ class AuthService(private val qrCodeRepository: QrCodeRepository){
         )
 
         qrCodeRepository.save(qrCodeRequest)
+    }
+
+    fun getTokenPair(token: String): TokenResponseDTO {
+        val email = JwtUtil.getSubjectFromToken(token)
+        val accessToken = JwtUtil.createToken(email, 15L, ChronoUnit.MINUTES)
+        val refreshToken = JwtUtil.createToken(email, 7L, ChronoUnit.DAYS)
+        return TokenResponseDTO(accessToken, refreshToken)
     }
 
 }

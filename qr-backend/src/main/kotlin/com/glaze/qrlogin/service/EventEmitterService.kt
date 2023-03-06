@@ -30,12 +30,13 @@ class EventEmitterService {
         emitter.send(event)
     }
 
-    fun sendPerfromLoginEvent(emitter: SseEmitter) {
+    fun sendPerformLoginEvent(emitter: SseEmitter) {
         val event = SseEmitter.event()
             .name(performLoginEventName)
             .data("dummy data")
 
         emitter.send(event)
+        emitter.complete()
     }
 
     fun sendCancelLoginEventName(emitter: SseEmitter) {
@@ -44,6 +45,7 @@ class EventEmitterService {
                 .data("dummy data")
 
         emitter.send(event)
+        emitter.complete()
     }
 
 }
