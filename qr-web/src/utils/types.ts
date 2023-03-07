@@ -9,6 +9,11 @@ export type User = {
   profilePicture: string;
 };
 
+export type DisplayUserEventDTO = {
+  user: User;
+  mobileId: string;
+}
+
 export type QrCode = {
   issuedFor: string;
   mobileId: string;

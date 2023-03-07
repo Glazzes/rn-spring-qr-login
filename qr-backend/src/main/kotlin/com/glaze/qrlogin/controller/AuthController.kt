@@ -21,6 +21,7 @@ class AuthController(private val authService: AuthService) {
     fun login() = ResponseEntity.status(HttpStatus.NO_CONTENT)
         .build<Unit>()
 
+
     @PostMapping("/login-qr")
     fun qrLogin() = ResponseEntity.status(HttpStatus.NO_CONTENT)
         .build<Unit>()

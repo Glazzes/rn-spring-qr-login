@@ -16,14 +16,18 @@ class QrAuthenticationProvider(
 ): AuthenticationProvider {
 
     override fun authenticate(authentication: Authentication): Authentication {
-        val (issuedFor, mobileId, deviceId) = authentication.principal as QrCodeLoginRequest
-        val exists = qrCodeRepository.existsByIssuedForAndMobileIdAndDeviceId(issuedFor, mobileId, deviceId)
+        val request = authentication.principal as QrCodeLoginRequest
+        val exists = qrCodeRepository.existsByIssuedForAndMobileIdAndDeviceId(
+            request.issuedFor,
+            request.mobileId,
+            request.deviceId
+        )
 
         if(!exists) {
             throw QrRequestNotFoundException("There was not a qr code registered with these credentials")
         }
 
-        val principal = userDetailsService.loadUserById(issuedFor) as UserToUserDetailsAdapter
+        val principal = userDetailsService.loadUserById(request.issuedFor) as UserToUserDetailsAdapter
         val successfulAuthentication = SuccessfulAuthenticationToken(principal)
         successfulAuthentication.isAuthenticated = true
 

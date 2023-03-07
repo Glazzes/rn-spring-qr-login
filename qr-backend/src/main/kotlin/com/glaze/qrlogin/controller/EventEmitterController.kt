@@ -35,12 +35,15 @@ class EventEmitterController(
     }
 
     @PostMapping(path = ["/{id}/display-user"])
-    fun sendUserShowEvent(@PathVariable id:String): ResponseEntity<Unit> {
+    fun sendUserShowEvent(
+        @PathVariable id:String,
+        @RequestParam mobileId: String
+    ): ResponseEntity<Unit> {
         val emitter = eventEmitters.get(id) ?:
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
                 .build()
 
-        eventEmitterService.sendDisplayUserEvent(emitter)
+        eventEmitterService.sendDisplayUserEvent(emitter, mobileId)
         return ResponseEntity.status(HttpStatus.NO_CONTENT)
             .build()
     }

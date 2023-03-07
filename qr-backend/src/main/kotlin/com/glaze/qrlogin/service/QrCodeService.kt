@@ -18,6 +18,8 @@ class QrCodeService(
             throw AssociationException("You attempted to issue a token for another user")
         }
 
+        println(request.toString())
+
         val entity = QrCode(
             issuedFor = request.issuedFor,
             mobileId = request.mobileId,

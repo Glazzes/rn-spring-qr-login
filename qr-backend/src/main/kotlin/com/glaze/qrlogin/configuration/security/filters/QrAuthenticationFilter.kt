@@ -20,7 +20,7 @@ import java.time.temporal.ChronoUnit
 
 class QrAuthenticationFilter(
     authenticationManager: AuthenticationManager
-): AbstractAuthenticationProcessingFilter(AntPathRequestMatcher("/api/v1/login/qr", HttpMethod.POST.name())) {
+): AbstractAuthenticationProcessingFilter(AntPathRequestMatcher("/api/v1/auth/login-qr", HttpMethod.POST.name())) {
     private val objectMapper = jacksonObjectMapper()
 
     init {
@@ -29,6 +29,7 @@ class QrAuthenticationFilter(
 
     override fun attemptAuthentication(request: HttpServletRequest, response: HttpServletResponse): Authentication {
         val qrCodeRequest = objectMapper.readValue(request.inputStream, QrCodeLoginRequest::class.java)
+        println(qrCodeRequest.toString())
 
         return this.authenticationManager
             .authenticate(QrAuthenticationToken(qrCodeRequest))
@@ -50,8 +51,8 @@ class QrAuthenticationFilter(
         SecurityContextHolder.getContext().authentication = successfulAuthenticationToken
 
         response.status = HttpStatus.NO_CONTENT.value()
-        response.setHeader("Authorization", accessToken)
-        response.setHeader("Refresh-Token", refreshToken)
+        response.addHeader("Authorization", accessToken)
+        response.addHeader("Refresh-Token", refreshToken)
 
         chain.doFilter(request, response)
     }

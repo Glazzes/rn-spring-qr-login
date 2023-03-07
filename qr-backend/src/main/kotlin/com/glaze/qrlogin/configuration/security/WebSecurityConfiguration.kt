@@ -49,18 +49,19 @@ class WebSecurityConfiguration (
     fun filterChain(http: HttpSecurity): SecurityFilterChain {
         http.cors {
             val configuration = CorsConfiguration()
-            configuration.allowedMethods = listOf("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS", "HEAD")
+            configuration.allowedMethods = listOf("GET", "POST", "PUT", "DELETE", "PATCH", "HEAD")
             configuration.allowCredentials = true
-            configuration.maxAge = 60 * 60 * 1000
+            configuration.maxAge = 3600L
             configuration.allowedOrigins = listOf("http://localhost:19006", "http://192.168.100.4:19006")
-            configuration.exposedHeaders = listOf("Authorization", "Refresh-Token")
-            configuration.allowedHeaders = listOf("Authorization", "Refresh-Token")
+            configuration.allowedHeaders = listOf("*")
+            configuration.exposedHeaders = listOf("Authorization,Refresh-Token")
 
             val source = UrlBasedCorsConfigurationSource()
             source.registerCorsConfiguration("/**", configuration)
 
             it.configurationSource(source)
-        }.csrf { it.disable() }
+            }
+            .csrf { it.disable() }
             .sessionManagement { it.sessionCreationPolicy(SessionCreationPolicy.STATELESS) }
             .authorizeHttpRequests {
                 it.requestMatchers(

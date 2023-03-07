@@ -9,12 +9,12 @@ import {
   Animated,
   Alert,
 } from 'react-native';
-import React, {useEffect, useRef, useState} from 'react';
+import React, {useCallback, useEffect, useRef, useState} from 'react';
 import {browserName, browserVersion, osName, osVersion} from 'react-device-detect';
 import {QRCodeSVG} from 'qrcode.react';
 import {v4 as uuid} from 'uuid';
 import axios from 'axios';
-import {QrCode, User} from '../../utils/types';
+import {DisplayUserEventDTO, QrCode, User} from '../../utils/types';
 import {getEventSourceUrl, getProfilePictureUrl, qrLogin} from '../../utils/urls';
 import {SIZE} from '../../utils/contants';
 import {setAccessToken} from '../../utils/authStore';
@@ -62,10 +62,10 @@ const QrCodeLogin: React.FC = () => {
   };
 
   const displayCurrentUser = (e: {data: string}) => {
-    const user = JSON.parse(e.data) as User;
+    const {user, mobileId} = JSON.parse(e.data) as DisplayUserEventDTO;
     user.profilePicture = getProfilePictureUrl(user.profilePicture);
     setUser(user);
-    setQrCode((qr) => ({...qr, issuedFor: user.id, mobileId: 'some-mobile-id'}));
+    setQrCode((qr) => ({...qr, issuedFor: user.id, mobileId}));
     translateContainer(-1 * SIZE);
 
     const interval = setInterval(() => {
@@ -85,12 +85,11 @@ const QrCodeLogin: React.FC = () => {
     }, 1000)
   }
 
-  const login = () => {
+  const login = useCallback(() => {
     axios
-      .post(qrLogin, qrCode, {withCredentials: false})
+      .post(qrLogin, qrCode)
       .then(response => {
         const token = response.headers['authorization'];
-        console.log(response.headers)
         if (token) {
           setAccessToken(token);
         } else {
@@ -98,7 +97,7 @@ const QrCodeLogin: React.FC = () => {
         }
       })
       .catch((e) => console.log(e, 'fail'));
-  }
+  }, [qrCode])
 
   const setToBaseState = () => {
     const newId = uuid();
@@ -130,9 +129,8 @@ const QrCodeLogin: React.FC = () => {
       eventSource.removeEventListener(Events.DISPLAY_USER, displayCurrentUser);
       eventSource.removeEventListener(Events.PERFORM_LOGIN, login);
       eventSource.removeEventListener(Events.CANCEL_LOGIN, setToBaseState);
-      eventSource.close();
     }
-  }, [eventSource]);
+  }, [eventSource, login]);
 
   useEffect(() => {
     axios

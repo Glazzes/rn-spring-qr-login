@@ -1,5 +1,6 @@
 package com.glaze.qrlogin.service
 
+import com.glaze.qrlogin.dtos.response.DisplayUserEventDTO
 import com.glaze.qrlogin.dtos.response.UserDTO
 import com.glaze.qrlogin.utils.SecurityUtil
 import org.springframework.beans.factory.annotation.Value
@@ -19,9 +20,13 @@ class EventEmitterService {
     @Value(value = "\${events.cancel-login}")
     private lateinit var cancelLoginEventName: String
 
-    fun sendDisplayUserEvent(emitter: SseEmitter) {
+    fun sendDisplayUserEvent(emitter: SseEmitter, mobileId: String) {
         val authenticatedUser = SecurityUtil.getAuthenticatedUser()
-        val data = UserDTO(authenticatedUser.id, authenticatedUser.username, authenticatedUser.profilePicture)
+        val userDTO = UserDTO(authenticatedUser.id, authenticatedUser.username, authenticatedUser.profilePicture)
+        val data = DisplayUserEventDTO(
+            user = userDTO,
+            mobileId
+        )
 
         val event = SseEmitter.event()
             .name(displayUserEventName)

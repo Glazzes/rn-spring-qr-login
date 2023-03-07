@@ -30,7 +30,11 @@ const Camera: React.FC = () => {
       await axiosInstance.post(apiSaveQRCodeUrl, qrCode);
 
       const url = displayUserEventUrl(qrCode.deviceId);
-      await axiosInstance.post(url);
+      await axiosInstance.post(url, undefined, {
+        params: {
+          mobileId: qrCode.mobileId,
+        },
+      });
 
       navigation.navigate('DeviceInformation', {
         ipAddress: qrCode.ipAddress,
@@ -58,8 +62,9 @@ const Camera: React.FC = () => {
           return;
         }
 
+        const mobileId = uuid.v4();
         qrCode.issuedFor = selector.auth.user.id;
-        qrCode.mobileId = uuid.v4();
+        qrCode.mobileId = mobileId;
 
         saveQrCode(qrCode);
       } catch (e) {

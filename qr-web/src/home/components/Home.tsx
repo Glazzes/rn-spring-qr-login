@@ -1,12 +1,13 @@
-import {View, Text, StyleSheet, Image} from "react-native";
-import React, {useEffect} from "react";
-import {useSnapshot} from "valtio";
-import {authState, setUser} from "../../utils/authStore";
-import axios from "axios";
-import {loggedInUser} from "../../utils/urls";
+import {View, Text, StyleSheet, Image} from 'react-native';
+import React, {useEffect} from 'react';
+import {useSnapshot} from 'valtio';
+import {authState, setUser} from '../../utils/authStore';
+import axios from 'axios';
+import {getProfilePictureUrl, loggedInUser} from '../../utils/urls';
 
 const Home: React.FC = () => {
   const state = useSnapshot(authState);
+  const profilePicture = getProfilePictureUrl(state.user.profilePicture);
 
   useEffect(() => {
     axios
@@ -17,13 +18,13 @@ const Home: React.FC = () => {
 
   return (
     <View style={styles.root}>
-      <Image source={{uri: state.user.profilePicture}} style={styles.image} />
+      <Image source={{uri: profilePicture}} style={styles.image} />
       <Text style={styles.text}>You have logged in successfully {state.user.username}!</Text>
       <Text style={styles.text}>
-        User id {"=>"} {state.user.id}
+        User id {'=>'} {state.user.id}
       </Text>
       <Text style={styles.text}>
-        Access token {"=>"} {state.accessToken}
+        Access token {'=>'} {state.accessToken}
       </Text>
     </View>
   );
@@ -32,9 +33,9 @@ const Home: React.FC = () => {
 const styles = StyleSheet.create({
   root: {
     flex: 1,
-    backgroundColor: "#fff",
-    justifyContent: "center",
-    alignItems: "center",
+    backgroundColor: '#fff',
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   image: {
     width: 200,
@@ -43,8 +44,8 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   text: {
-    color: "#2C3639",
-    fontWeight: "bold",
+    color: '#2C3639',
+    fontWeight: 'bold',
     fontSize: 15,
     marginBottom: 10,
   },
