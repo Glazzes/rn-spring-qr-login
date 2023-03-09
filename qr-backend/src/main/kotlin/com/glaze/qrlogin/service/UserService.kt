@@ -12,6 +12,7 @@ import org.springframework.validation.BindException
 import org.springframework.validation.FieldError
 import org.springframework.validation.MapBindingResult
 import jakarta.validation.Validator
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.web.multipart.MultipartFile
 import kotlin.jvm.Throws
 
@@ -22,10 +23,13 @@ class UserService(
     private val passwordEncoder: PasswordEncoder
 ){
 
+    @Value("\${web.app.image-store}")
+    private lateinit var destination: String
+
     fun save(request: SignUpRequest, picture: MultipartFile): UserDTO {
         validate(request)
 
-        val profilePictureId = FileUtil.save(picture)
+        val profilePictureId = FileUtil.save(picture, destination)
         val userEntity = User(
             username = request.username,
             password = passwordEncoder.encode(request.password),

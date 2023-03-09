@@ -10,23 +10,22 @@ import java.util.Locale
 import java.util.UUID
 
 object FileUtil {
-    private val tmpDir = System.getProperty("java.io.tmpdir")
     private val formatter = DateTimeFormatter.ofPattern("ddMMyyyy", Locale.ENGLISH)
 
     /**
      * Saves the user picture to the OS tmp dir and returns the filename for static handling
      */
-    fun save(file: MultipartFile): String {
+    fun save(file: MultipartFile, basePath: String): String {
         val now = formatter.format(LocalDate.now())
         val filename = UUID.randomUUID().toString() + now + ".jpeg"
-        val path = Paths.get("${tmpDir}/$filename")
+        val path = Paths.get("${basePath}/$filename")
         file.transferTo(path)
 
         return filename
     }
 
-    fun findByName(filename: String) = StreamingResponseBody { out ->
-        val path = Paths.get("${tmpDir}/$filename")
+    fun findByName(filename: String, basePath: String) = StreamingResponseBody { out ->
+        val path = Paths.get("${basePath}/$filename")
 
         FileInputStream(path.toFile()).use { input ->
             val buffer = ByteArray(4096)

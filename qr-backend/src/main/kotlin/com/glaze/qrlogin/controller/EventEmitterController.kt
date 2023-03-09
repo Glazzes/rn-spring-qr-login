@@ -14,8 +14,7 @@ class EventEmitterController(
     private val eventEmitterService: EventEmitterService,
     private val eventEmitters: EventEmitters
 ){
-
-    private val timeout = 1000 * 60 * 10L
+    private val timeout = 1000 * 600L
 
     @GetMapping(path = ["/{id}/register"], produces = [MediaType.TEXT_EVENT_STREAM_VALUE])
     fun register(@PathVariable id: String) : SseEmitter {
@@ -65,6 +64,13 @@ class EventEmitterController(
             .build()
 
         eventEmitterService.sendPerformLoginEvent(emitter)
+        return ResponseEntity.status(HttpStatus.NO_CONTENT)
+            .build()
+    }
+
+    @DeleteMapping(path = ["/{id}"])
+    fun delete(@PathVariable id: String): ResponseEntity<Unit> {
+        eventEmitters.remove(id)
         return ResponseEntity.status(HttpStatus.NO_CONTENT)
             .build()
     }

@@ -11,13 +11,13 @@ import org.springframework.web.servlet.mvc.method.annotation.SseEmitter
 @Service
 class EventEmitterService {
 
-    @Value(value = "\${events.display-user}")
+    @Value(value = "\${web.app.events.display-user}")
     private lateinit var displayUserEventName: String
 
-    @Value(value = "\${events.perform-login}")
+    @Value(value = "\${web.app.events.perform-login}")
     private lateinit var performLoginEventName: String
 
-    @Value(value = "\${events.cancel-login}")
+    @Value(value = "\${web.app.events.cancel-login}")
     private lateinit var cancelLoginEventName: String
 
     fun sendDisplayUserEvent(emitter: SseEmitter, mobileId: String) {

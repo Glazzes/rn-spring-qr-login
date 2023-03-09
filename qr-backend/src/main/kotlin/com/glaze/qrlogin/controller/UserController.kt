@@ -4,10 +4,12 @@ import com.glaze.qrlogin.dtos.response.UserDTO
 import com.glaze.qrlogin.dtos.request.SignUpRequest
 import com.glaze.qrlogin.service.UserService
 import jakarta.validation.Valid
+import org.springframework.http.CacheControl
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.multipart.MultipartFile
+import java.util.concurrent.TimeUnit
 
 @RestController
 @RequestMapping("/api/v1/users")
@@ -38,7 +40,8 @@ class UserController(private val userService: UserService) {
     @GetMapping("/exists")
     fun exists(@RequestParam email: String): ResponseEntity<Boolean> {
         return ResponseEntity.status(HttpStatus.OK)
-                .body(userService.existsByEmail(email))
+            .cacheControl(CacheControl.maxAge(1L, TimeUnit.MINUTES))
+            .body(userService.existsByEmail(email))
     }
 
 }

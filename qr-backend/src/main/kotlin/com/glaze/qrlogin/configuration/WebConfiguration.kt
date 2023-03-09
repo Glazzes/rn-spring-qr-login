@@ -5,8 +5,6 @@ import com.glaze.qrlogin.dtos.request.SignUpRequest
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.core.convert.converter.Converter
-import org.springframework.web.servlet.config.annotation.CorsRegistry
-import org.springframework.web.servlet.config.annotation.WebMvcConfigurer
 
 @Configuration
 class WebConfiguration {
@@ -23,20 +21,4 @@ class WebConfiguration {
         }
     }
 
-    /*
-    @Bean
-    fun webMvcConfigurer(): WebMvcConfigurer {
-        return object : WebMvcConfigurer {
-            override fun addCorsMappings(registry: CorsRegistry) {
-                registry.addMapping("/**")
-                    .allowedHeaders("*")
-                    .exposedHeaders("*")
-                    .allowedOrigins("http://localhost:19006")
-                    .maxAge(3600L)
-                    .allowCredentials(true)
-            }
-        }
-    }
-    */
-     */
 }

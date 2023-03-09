@@ -2,7 +2,6 @@ package com.glaze.qrlogin.configuration
 
 import org.springframework.aop.interceptor.AsyncUncaughtExceptionHandler
 import org.springframework.aop.interceptor.SimpleAsyncUncaughtExceptionHandler
-import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.core.task.AsyncTaskExecutor
@@ -29,11 +28,11 @@ class AsyncConfiguration : AsyncConfigurer {
     }
 
     @Bean
-    fun webConfigurer(@Qualifier("taskExecutor") taskExecutor: AsyncTaskExecutor): WebMvcConfigurer {
+    fun webConfigurer(): WebMvcConfigurer {
         return object : WebMvcConfigurer {
             override fun configureAsyncSupport(configurer: AsyncSupportConfigurer) {
                 configurer.setDefaultTimeout(500000)
-                    .setTaskExecutor(taskExecutor)
+                    .setTaskExecutor(asyncExecutor as AsyncTaskExecutor)
             }
         }
     }

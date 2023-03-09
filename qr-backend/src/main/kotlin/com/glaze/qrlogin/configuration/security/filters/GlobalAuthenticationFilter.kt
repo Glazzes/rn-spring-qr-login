@@ -46,7 +46,6 @@ class GlobalAuthenticationFilter(
         try {
             email = JwtUtil.getSubjectFromToken(accessToken)
         }catch (e: Exception) {
-            e.printStackTrace()
             filterChain.doFilter(request, response)
             return
         }

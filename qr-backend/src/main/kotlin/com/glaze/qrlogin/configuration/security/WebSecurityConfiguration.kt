@@ -1,5 +1,6 @@
 package com.glaze.qrlogin.configuration.security
 
+import com.glaze.qrlogin.configuration.WebConfigurationProperties
 import com.glaze.qrlogin.repositories.QrCodeRepository
 import com.glaze.qrlogin.configuration.security.filters.GlobalAuthenticationFilter
 import com.glaze.qrlogin.configuration.security.filters.QrAuthenticationFilter
@@ -27,11 +28,9 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource
 @EnableWebSecurity
 class WebSecurityConfiguration (
     private val userDetailsService: UserDetailsService,
-    private val qrCodeRepository: QrCodeRepository
+    private val qrCodeRepository: QrCodeRepository,
+    private val properties: WebConfigurationProperties
 ){
-
-    @Value(value = "\${web.app.origin}")
-    private lateinit var origin: String
 
     @Bean
     fun authenticationManager(): AuthenticationManager {
@@ -52,7 +51,7 @@ class WebSecurityConfiguration (
             configuration.allowedMethods = listOf("GET", "POST", "PUT", "DELETE", "PATCH", "HEAD")
             configuration.allowCredentials = true
             configuration.maxAge = 3600L
-            configuration.allowedOrigins = listOf("http://localhost:19006", "http://192.168.100.4:19006")
+            configuration.allowedOrigins = properties.origins
             configuration.allowedHeaders = listOf("*")
             configuration.exposedHeaders = listOf("Authorization,Refresh-Token")
 
@@ -77,6 +76,7 @@ class WebSecurityConfiguration (
                         "/api/v1/users",
                         "/api/v1/users/validate",
                         "/api/v1/auth/*",
+                        "/api/v1/events/{id}",
                         "/api/v1/events/{id}/register",
                     )
                         .permitAll()

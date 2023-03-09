@@ -29,7 +29,6 @@ class QrAuthenticationFilter(
 
     override fun attemptAuthentication(request: HttpServletRequest, response: HttpServletResponse): Authentication {
         val qrCodeRequest = objectMapper.readValue(request.inputStream, QrCodeLoginRequest::class.java)
-        println(qrCodeRequest.toString())
 
         return this.authenticationManager
             .authenticate(QrAuthenticationToken(qrCodeRequest))

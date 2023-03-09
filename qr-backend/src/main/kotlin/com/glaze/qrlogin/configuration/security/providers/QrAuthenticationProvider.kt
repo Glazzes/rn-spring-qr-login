@@ -31,6 +31,7 @@ class QrAuthenticationProvider(
         val successfulAuthentication = SuccessfulAuthenticationToken(principal)
         successfulAuthentication.isAuthenticated = true
 
+        println("validated")
         return successfulAuthentication
     }
 

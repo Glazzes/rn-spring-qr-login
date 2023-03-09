@@ -5,11 +5,11 @@ import org.hibernate.validator.constraints.Length
 import jakarta.validation.constraints.NotBlank
 
 data class LoginRequest(
-    @NotBlank(message = "{user.email.required}")
-    @Email(message = "{email.not-valid}")
+    @get:NotBlank(message = "{user.email.required}")
+    @get:Email(message = "{email.not-valid}")
     val email: String,
 
-    @NotBlank(message = "{user.password.required}")
-    @Length(min = 8, max = 50, message = "{user.password.length}")
+    @get:NotBlank(message = "{user.password.required}")
+    @get:Length(min = 8, max = 50, message = "{user.password.length}")
     val password: String,
 )
