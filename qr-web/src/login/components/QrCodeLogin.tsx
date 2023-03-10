@@ -5,7 +5,6 @@ import {
   StyleSheet,
   ActivityIndicator,
   Image,
-  Pressable,
   Animated,
   Alert,
 } from 'react-native';
@@ -13,13 +12,15 @@ import React, {useCallback, useEffect, useRef, useState} from 'react';
 import {browserName, browserVersion, osName, osVersion} from 'react-device-detect';
 import {QRCodeSVG} from 'qrcode.react';
 import {v4 as uuid} from 'uuid';
-import axios from 'axios';
+import axios, { AxiosError } from 'axios';
 import {DisplayUserEventDTO, QrCode, User} from '../../utils/types';
-import {getEventSourceUrl, getProfilePictureUrl, qrLogin} from '../../utils/urls';
+import {deleteSourceUrl, getEventSourceUrl, getProfilePictureUrl, qrLogin} from '../../utils/urls';
 import {SIZE} from '../../utils/contants';
-import {setAccessToken} from '../../utils/authStore';
+import {setAccessToken, setIsAuthenticated} from '../../utils/authStore';
 import {Events} from '../../utils/enums';
-import { COUNNTDOWN_SECONDS } from '../utils/constants';
+import {COUNNTDOWN_SECONDS} from '../utils/constants';
+import {axiosInstance} from '../../utils/axiosInstace';
+import Button from '../../shared/Button';
 
 const deviceId = uuid();
 
@@ -70,7 +71,7 @@ const QrCodeLogin: React.FC = () => {
 
     const interval = setInterval(() => {
       elapsedTime.current += 1;
-      if(elapsedTime.current > COUNNTDOWN_SECONDS) {
+      if(elapsedTime.current >= COUNNTDOWN_SECONDS) {
         elapsedTime.current = 0;
         clearInterval(interval)
         setToBaseState();
@@ -86,12 +87,16 @@ const QrCodeLogin: React.FC = () => {
   }
 
   const login = useCallback(() => {
-    axios
+    axiosInstance
       .post(qrLogin, qrCode)
       .then(response => {
-        const token = response.headers['authorization'];
-        if (token) {
-          setAccessToken(token);
+        const accessToken = response.headers['authorization'];
+        const refreshToken = response.headers['refresh-token'];
+        console.log(response.headers)
+        if (accessToken && refreshToken) {
+          localStorage.setItem('tokens', JSON.stringify({accessToken, refreshToken}));
+          setAccessToken(accessToken);
+          setIsAuthenticated(true);
         } else {
           Alert.alert('Login successfull but no access token was present');
         }
@@ -99,25 +104,36 @@ const QrCodeLogin: React.FC = () => {
       .catch((e) => console.log(e, 'fail'));
   }, [qrCode])
 
-  const setToBaseState = () => {
-    const newId = uuid();
-
-    setDisplayCode(false);
-    setUser(EMPTY_USER);
-    translateContainer(0);
-    setQrCode(qr => ({...qr, deviceId: newId, issuedFor: '', mobileId: ''}));
-    setTextTime('10:00');
+  const setToBaseState = async () => {
     elapsedTime.current = 0;
+    try{
+      const url = deleteSourceUrl(qrCode.deviceId);
+      await axiosInstance.delete(url)
 
-    const newUrl = getEventSourceUrl(newId);
-    setEventSource(new EventSource(newUrl));
+      const newId = uuid();
 
-    translateContainer(0);
+      setDisplayCode(false);
+      setUser(EMPTY_USER);
+      translateContainer(0);
+      setQrCode(qr => ({...qr, deviceId: newId, issuedFor: '', mobileId: ''}));
+      setTextTime('10:00');
+      
+      setEventSource(prev => {
+        prev.close();
+        const newUrl = getEventSourceUrl(newId);
+        return new EventSource(newUrl)
+      });
 
-    const timeout = setTimeout(() => {
-      setDisplayCode(true);
-      clearTimeout(timeout);
-    }, 1000)
+      translateContainer(0);
+
+      const timeout = setTimeout(() => {
+        setDisplayCode(true);
+        clearTimeout(timeout);
+      }, 1000)
+
+    }catch(e) {
+      console.log((e as AxiosError).response)
+    }
   }
 
   useEffect(() => {
@@ -134,12 +150,12 @@ const QrCodeLogin: React.FC = () => {
 
   useEffect(() => {
     axios
-      .get('https://freeipapi.com/api/json')
+      .get('https://ipapi.co/json/')
       .then(({data}) => {
         setQrCode((qr) => ({
           ...qr,
-          ipAddress: data.ipAddress,
-          location: `${data.cityName}, ${data.countryName}`,
+          ipAddress: data.ip,
+          location: `${data.city}, ${data.country_name}`,
         }));
 
         setDisplayCode(true);
@@ -182,11 +198,7 @@ const QrCodeLogin: React.FC = () => {
             You're logging in as <Text style={styles.username}>{user.username}</Text>
           </Text>
           <Text style={[styles.text, styles.margin]}>{textTime}</Text>
-          <Pressable
-            style={styles.button}
-            onPress={setToBaseState}>
-            <Text style={styles.buttonText}>This is not me</Text>
-          </Pressable>
+          <Button action={'decline'} text={'This is not me'} onPress={setToBaseState} width={SIZE} />
         </View>
       </Animated.View>
     </View>
@@ -245,18 +257,6 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     fontSize: 15,
     textTransform: 'capitalize',
-  },
-  button: {
-    padding: 10,
-    backgroundColor: '#E94560',
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginVertical: 10,
-    borderRadius: 5,
-  },
-  buttonText: {
-    color: '#fff',
-    fontSize: 15,
   },
   margin: {
     marginVertical: 5,

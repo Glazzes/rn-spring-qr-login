@@ -22,7 +22,7 @@
     "react-native": "0.64.3",
     "react-native-safe-area-context": "3.3.2",
     "react-native-screens": "~3.10.1",
-    "react-native-web": "0.17.1",
+    "react-native-web": "^0.18.12",
     "uuid": "^8.3.2",
     "valtio": "^1.7.0"
   },

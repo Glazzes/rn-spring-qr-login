@@ -1,6 +1,6 @@
 export type StackScreens = {
   Login: undefined;
-  Home: {accessToken: string};
+  Home: undefined;
 };
 
 export type User = {
@@ -8,6 +8,11 @@ export type User = {
   username: string;
   profilePicture: string;
 };
+
+export type Tokens = {
+  accessToken: string;
+  refreshToken: string;
+}
 
 export type DisplayUserEventDTO = {
   user: User;

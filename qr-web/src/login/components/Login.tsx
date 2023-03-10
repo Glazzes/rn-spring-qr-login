@@ -1,15 +1,13 @@
-import {View, Text, StyleSheet} from "react-native";
-import React from "react";
-import {SIZE} from "../../utils/contants";
-import UsernamePasswordLogin from "./UsernamePasswordLogin";
-import QrCodeLogin from "./QrCodeLogin";
+import {View, StyleSheet} from 'react-native';
+import React from 'react';
+import {SIZE} from '../../utils/contants';
+import EmailPasswordLogin from './EmailPasswordLogin';
+import QrCodeLogin from './QrCodeLogin';
 
-type LoginProps = {};
-
-const Login: React.FC<LoginProps> = ({}) => {
+const Login: React.FC = () => {
   return (
     <View style={styles.root}>
-      <UsernamePasswordLogin />
+      <EmailPasswordLogin />
       <View style={styles.divider} />
       <QrCodeLogin />
     </View>
@@ -19,16 +17,16 @@ const Login: React.FC<LoginProps> = ({}) => {
 const styles = StyleSheet.create({
   root: {
     flex: 1,
-    backgroundColor: "#fff",
-    justifyContent: "center",
-    alignItems: "center",
-    flexDirection: "row",
+    backgroundColor: '#fff',
+    justifyContent: 'center',
+    alignItems: 'center',
+    flexDirection: 'row',
   },
   divider: {
     width: 2,
     height: SIZE - 10,
-    backgroundColor: "#2C3639",
-    marginHorizontal: 30,
+    backgroundColor: '#2C3639',
+    marginHorizontal: 32,
   },
 });
 
