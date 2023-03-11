@@ -3,6 +3,36 @@ export type Vector<T> = {
   y: T;
 };
 
+export type StackScreens = {
+  Login: {
+    createdAccount: boolean;
+  };
+
+  CreateAccount: undefined;
+
+  CropEditor: {
+    uri: string;
+    width: number;
+    height: number;
+  };
+
+  Home: undefined;
+
+  Warning: undefined;
+
+  DeviceInformation: {
+    id: string;
+    qrCode: QrCode;
+    location: string;
+    device: string;
+    ipAddress: string;
+  };
+
+  Scanner: undefined;
+
+  ScanResult: {information: Information};
+};
+
 export type AccountCreationFields =
   | 'username'
   | 'password'

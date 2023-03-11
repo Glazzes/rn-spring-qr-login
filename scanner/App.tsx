@@ -1,17 +1,17 @@
 import React, {useEffect, useState} from 'react';
 import {NavigationContainer} from '@react-navigation/native';
 import {Home} from './src/home';
-import {StackScreens} from './src/navigation/stackScreens';
 import {NativeBaseProvider} from 'native-base';
 import {DeviceInformation, PostScanInformation} from './src/post-scan';
 import {Scanner} from './src/scanner';
-import ScanWarning from './src/other/ScanWarning';
+import ScanWarning from './src/misc/ScanWarning';
 import {CreateAccount, Login} from './src/onboarding';
 import {createSharedElementStackNavigator} from 'react-navigation-shared-element';
 import {CropEditor} from './src/crop_editor';
 import {Provider, useSelector} from 'react-redux';
 import {RootState, store} from './src/store/store';
 import {loadAsync} from 'expo-font';
+import {StackScreens} from './src/utils/types';
 
 // LogBox.ignoreLogs(['[react-native-gesture-handler]']);
 

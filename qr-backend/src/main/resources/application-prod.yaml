@@ -1,14 +1,21 @@
-events:
-  display-user: display.user
-  perform-login: perform.login
-  cancel-login: cancel.login
-
-spring:
-  redis:
-    host: redis
-    port: 6379
-    database: 0
-
 web:
   app:
-    origin: web
+    image-store: /images
+    events:
+      display-user: display.user
+      perform-login: perform.login
+      cancel-login: cancel.login
+    origins:
+      - web:3000
+      - http://140.238.187.124
+
+spring:
+  servlet:
+    multipart:
+      max-file-size: 3MB
+      max-request-size: 3MB
+  data:
+    redis:
+      host: redis
+      port: 6379
+      database: 0

@@ -1,4 +1,4 @@
-export const host = 'http://localhost:8080';
+import {API_URL} from '@env';
 
 export const apiAuthLogin = '/api/v1/auth/login';
 export const apiTokenUrl = '/api/v1/auth/token';
@@ -11,9 +11,9 @@ export const deleteSourceUrl = (id: string): string => {
 }
 
 export const getProfilePictureUrl = (filename: string): string => {
-  return `${host}/static/${filename}`;
+  return `${API_URL}/static/${filename}`;
 }
 
 export const getEventSourceUrl = (id: string): string => {
-  return `${host}/api/v1/events/${id}/register`;
+  return `${API_URL}/api/v1/events/${id}/register`;
 }

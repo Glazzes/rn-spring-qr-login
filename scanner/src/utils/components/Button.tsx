@@ -1,29 +1,24 @@
-import {
-  Text,
-  Pressable,
-  StyleSheet,
-  ViewStyle,
-  TextStyle,
-  Keyboard,
-} from 'react-native';
+import {Text, Pressable, StyleSheet, Keyboard, ViewStyle} from 'react-native';
 import React, {useState} from 'react';
 
+type ButtonAction = 'accept' | 'decline';
+
 type ButtonProps = {
+  action: ButtonAction;
   width: number;
   text: string;
-  extraStyle?: ViewStyle;
-  extraTextStyle?: TextStyle;
-  disabled?: boolean;
   onPress: () => Promise<void>;
+  disabled?: boolean;
+  extraStyle?: ViewStyle;
 };
 
 const Button: React.FC<ButtonProps> = ({
+  action,
   width,
   text,
-  extraStyle,
-  extraTextStyle,
   disabled,
   onPress,
+  extraStyle,
 }) => {
   const [isPerformingAction, setIsPerformingAction] = useState<boolean>(false);
 
@@ -38,17 +33,23 @@ const Button: React.FC<ButtonProps> = ({
   return (
     <Pressable
       onPress={onPressWrapper}
-      style={
-        isPerformingAction || disabled
-          ? [styles.button, styles.disabledButton, {width}, extraStyle]
-          : [styles.button, styles.enabledButton, {width}, extraStyle]
-      }>
+      style={[
+        styles.button,
+        action === 'accept' ? styles.acceptButton : styles.declineButton,
+        isPerformingAction || disabled ? styles.disabledButton : undefined,
+        {width},
+        extraStyle,
+      ]}>
       <Text
-        style={
+        style={[
+          styles.text,
+          action === 'accept'
+            ? styles.acceptButtonText
+            : styles.declineButtonText,
           isPerformingAction || disabled
-            ? [styles.disabledButtonText, extraTextStyle]
-            : [styles.enableButtonText, extraTextStyle]
-        }>
+            ? styles.disabledButtonText
+            : undefined,
+        ]}>
         {text}
       </Text>
     </Pressable>
@@ -60,21 +61,31 @@ const styles = StyleSheet.create({
     padding: 10,
     justifyContent: 'center',
     alignItems: 'center',
-    borderRadius: 10,
-    height: 44,
+    borderRadius: 5,
+    height: 40,
   },
-  enabledButton: {
+  acceptButton: {
     backgroundColor: '#3366ff',
   },
-  enableButtonText: {
-    fontFamily: 'UberBold',
-    color: '#fff',
+  declineButton: {
+    backgroundColor: '#fff',
+    borderWidth: 0.5,
+    borderColor: '#E94560',
   },
   disabledButton: {
     backgroundColor: '#EDF1F7',
+    borderWidth: 0,
+  },
+  text: {
+    fontFamily: 'UberBold',
+  },
+  acceptButtonText: {
+    color: '#fff',
+  },
+  declineButtonText: {
+    color: '#E94560',
   },
   disabledButtonText: {
-    fontFamily: 'UberBold',
     color: '#c3c3c3',
   },
 });

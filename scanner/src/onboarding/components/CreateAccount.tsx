@@ -18,12 +18,11 @@ import {axiosInstance} from '../../utils/axiosInstance';
 import {apiUsersExistsByEmailUrl, apiUsersValidateUrl} from '../../utils/urls';
 import Button from '../../utils/components/Button';
 import {NavigationProp} from '@react-navigation/native';
-import {StackScreens} from '../../navigation/stackScreens';
 import {useSharedValue, withTiming} from 'react-native-reanimated';
 import ImagePicker from './ImagePicker';
 import {useDispatch, useSelector} from 'react-redux';
 import {updateField} from '../../store/slices/accountSlice';
-import {AccountCreationFields} from '../../utils/types';
+import {AccountCreationFields, StackScreens} from '../../utils/types';
 import {RootState} from '../../store/store';
 import {AxiosError} from 'axios';
 
@@ -270,6 +269,7 @@ const CreateAccount: React.FC<CreateAccountProps> = ({navigation}) => {
           </Text>
 
           <Button
+            action={'accept'}
             text="Confirm"
             disabled={
               isValidating ||

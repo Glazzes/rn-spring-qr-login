@@ -1,8 +1,4 @@
-FROM node:18.14-alpine
-WORKDIR /app
-COPY package*.json /app
-COPY yarn.lock /app
-RUN yarn install
-RUN yarn global add expo-cli
-COPY . .
-ENTRYPOINT ["yarn", "run", "web"]
+FROM nginx:stable-alpine
+ADD web-build /usr/share/nginx/html/web-build
+COPY nginx.conf /etc/nginx/
+EXPOSE 80

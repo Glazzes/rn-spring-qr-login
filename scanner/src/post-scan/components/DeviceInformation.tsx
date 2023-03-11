@@ -1,28 +1,28 @@
-import {Dimensions, Alert} from 'react-native';
+import {Dimensions, Alert, StyleSheet} from 'react-native';
 import React from 'react';
-import {Text, Box, Image, VStack, Button} from 'native-base';
+import {Text, Box, Image, VStack, StatusBar} from 'native-base';
 import {NavigationProp, RouteProp} from '@react-navigation/native';
-import {Information} from '../utils/types';
-import {StackScreens} from '../navigation/stackScreens';
-import {qrCancelLoginEventUrl, qrLoginPerformEventUrl} from '../utils/urls';
+import {Information, StackScreens} from '../../utils/types';
+import {qrCancelLoginEventUrl, qrLoginPerformEventUrl} from '../../utils/urls';
 import Info from './Info';
-import {axiosInstance} from '../utils/axiosInstance';
+import {axiosInstance} from '../../utils/axiosInstance';
 import {AxiosError} from 'axios';
+import Button from '../../utils/components/Button';
 
-const {width, height} = Dimensions.get('window');
-const found = require('../assets/found.png');
+const {width} = Dimensions.get('window');
+const found = require('../../assets/found.png');
 
 const paths: {[id: string]: Information} = {
   success: {
-    image: require('../assets/scan-success.png'),
+    image: require('../../assets/scan-success.png'),
     alt: 'Cat took over your phone',
-    title: 'Cats took over your phone',
-    info: "You've been logged into your device successfully",
+    title: 'You are logged in!',
+    info: 'We have logged you into your other device successfully!',
   },
   notFound: {
-    image: require('../assets/not-found.png'),
+    image: require('../../assets/not-found.png'),
     alt: 'Cat is looking at an empty bowl',
-    title: "It's empty?",
+    title: 'Missing device',
     info: 'We could not log you into your device, you may have taken too long or there was not such device in first place',
   },
 };
@@ -55,7 +55,7 @@ const DeviceInformation: React.FC<DeviceInformationProps> = ({
       }
 
       if (response?.status !== 404) {
-        Alert.alert('There was a problem while logging in');
+        console.log(response);
       }
     }
   };
@@ -80,22 +80,24 @@ const DeviceInformation: React.FC<DeviceInformationProps> = ({
 
   return (
     <Box flex={1} py={'4'} bg={'#fff'} alignItems={'center'}>
+      <StatusBar backgroundColor={'#fff'} barStyle={'light-content'} />
       <Image
         source={found}
-        width={width}
-        height={height / 2}
+        width={width - 60}
+        height={width - 60}
         resizeMode={'contain'}
-        alt={'Cat is looking at phone front camera'}
+        alt={'Phone, megaphone and a tablet'}
       />
       <VStack flex={1} justifyContent={'space-between'} alignItems={'center'}>
         <VStack>
           <Text
-            fontSize={'24'}
+            fontSize={'22'}
             fontWeight={'bold'}
+            fontFamily={'UberBold'}
             color={'#1d1d1d'}
             mb={'2'}
             textAlign={'center'}>
-            Your device
+            Is this your device?
           </Text>
           <Info text={route.params.device} />
           <Info text={`Ip address ${route.params.ipAddress}`} />
@@ -103,25 +105,28 @@ const DeviceInformation: React.FC<DeviceInformationProps> = ({
         </VStack>
         <VStack>
           <Button
-            bgColor={'#1d1d1d'}
-            textTransform={'uppercase'}
-            mb={'2'}
-            onPress={login}>
-            Log me in
-          </Button>
+            text={'Log me in'}
+            width={width * 0.5}
+            onPress={login}
+            action={'accept'}
+            extraStyle={styles.margin}
+          />
           <Button
-            variant={'outline'}
-            bgColor={'#fff'}
-            borderColor={'#1d1d1d'}
-            color={'#1d1d1d'}
-            textTransform={'uppercase'}
-            onPress={cancelLogin}>
-            <Info text={'This is not my device'} />
-          </Button>
+            text={'This is not my device'}
+            width={width * 0.5}
+            onPress={cancelLogin}
+            action={'decline'}
+          />
         </VStack>
       </VStack>
     </Box>
   );
 };
+
+const styles = StyleSheet.create({
+  margin: {
+    marginBottom: 16,
+  },
+});
 
 export default DeviceInformation;

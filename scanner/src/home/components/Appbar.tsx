@@ -1,13 +1,13 @@
 import React, {useEffect} from 'react';
-import {apiUsersMeUrl, getProfilePictureUrl} from '../utils/urls';
+import {apiUsersMeUrl, getProfilePictureUrl} from '../../utils/urls';
 import {useDispatch, useSelector} from 'react-redux';
-import {RootState} from '../store/store';
+import {RootState} from '../../store/store';
 import {View, Dimensions, Image, StyleSheet, Text} from 'react-native';
 import Constants from 'expo-constants';
-import {PADDING} from '../utils/constants';
-import {axiosInstance} from '../utils/axiosInstance';
-import {User} from '../utils/types';
-import {setCurrentUser} from '../store/slices/authSlice';
+import {PADDING} from '../../utils/constants';
+import {axiosInstance} from '../../utils/axiosInstance';
+import {User} from '../../utils/types';
+import {setCurrentUser} from '../../store/slices/authSlice';
 
 const IMAGE_SIZE = 40;
 
@@ -19,12 +19,10 @@ const Appbar: React.FC = () => {
   const imageUrl = getProfilePictureUrl(selector.user.profilePicture);
 
   useEffect(() => {
-    axiosInstance
-      .get<User>(apiUsersMeUrl)
-      .then(({data}) => {
-        dispatch(setCurrentUser(data));
-      })
-      // .catch(e => console.log(e.response));
+    axiosInstance.get<User>(apiUsersMeUrl).then(({data}) => {
+      dispatch(setCurrentUser(data));
+    });
+    // .catch(e => console.log(e.response));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 

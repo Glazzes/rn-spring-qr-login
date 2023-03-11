@@ -12,61 +12,63 @@ import React, {useEffect, useRef, useState} from 'react';
 import Icon from '@expo/vector-icons/Ionicons';
 import {impactAsync, ImpactFeedbackStyle} from 'expo-haptics';
 import RNBootSplash from 'react-native-bootsplash';
-import {NavigationProp, RouteProp} from '@react-navigation/native';
-import {StackScreens} from '../../navigation/stackScreens';
-import withKeyboard from '../../utils/hoc/withKeyboard';
-import {EmailPasswordLogin} from '../../utils/types';
-import Button from '../../utils/components/Button';
-import {apiAuthLogin} from '../../utils/urls';
 import {axiosInstance} from '../../utils/axiosInstance';
-import Toast from '../../misc/Toast';
-import {useDispatch} from 'react-redux';
-import {
-  setAuthenticationTokens,
-  setIsAuthenticated,
-} from '../../store/slices/authSlice';
+import {apiAuthLogin} from '../../utils/urls';
+import Button from '../../utils/components/Button';
+import withKeyboard from '../../utils/hoc/withKeyboard';
 import {mmkv} from '../../utils/mmkv';
+import {authState} from '../../store/authStore';
+import {StackScreens, TokenResponse} from '../../utils/types';
+import {NavigationProp, RouteProp} from '@react-navigation/native';
+import Toast from '../../misc/Toast';
+import {ACCOUNT_CREATED_INFO} from '../utils/constants';
+import {PADDING} from '../../utils/constants';
+import {useDispatch} from 'react-redux';
+import {setIsAuthenticated} from '../../store/slices/authSlice';
 
+const SPACING = 16;
 const {width} = Dimensions.get('window');
 
+type EmailPasswrodLogin = {
+  email: string;
+  password: string;
+};
+
 type LoginProps = {
-  route: RouteProp<StackScreens, 'Login'>;
   navigation: NavigationProp<StackScreens, 'Login'>;
+  route: RouteProp<StackScreens, 'Login'>;
 };
 
 const Login: React.FC<LoginProps> = ({route, navigation}) => {
+  const accountCreated = route.params.createdAccount;
   const dispatch = useDispatch();
 
-  const login = useRef<EmailPasswordLogin>({email: '', password: ''});
-  const [isSecure, setisSecure] = useState<boolean>(true);
+  const loginData = useRef<EmailPasswrodLogin>({email: '', password: ''});
+  const [isSecureText, setIsSecureText] = useState<boolean>(true);
 
   const toggleIsSecure = async () => {
     await impactAsync(ImpactFeedbackStyle.Light);
-    setisSecure(s => !s);
+    setIsSecureText(s => !s);
   };
 
-  const onChangeText = (text: string, type: 'username' | 'password') => {
-    if (type === 'username') {
-      login.current.email = text;
-    }
-
-    if (type === 'password') {
-      login.current.password = text;
-    }
+  const onChangeText = (text: string, field: 'email' | 'password') => {
+    loginData.current[field] = text;
   };
 
-  const signIn = async () => {
+  const login = async () => {
     try {
-      const response = await axiosInstance.post(apiAuthLogin, login.current);
-      const accessToken = response.headers.authorization;
-      const refreshToken = response.headers['refresh-token'];
+      const {headers} = await axiosInstance.post<TokenResponse>(
+        apiAuthLogin,
+        loginData.current,
+      );
 
+      const accessToken = headers.authorization;
+      const refreshToken = headers['refresh-token'];
+
+      authState.tokens = {accessToken, refreshToken};
       mmkv.set('tokens', JSON.stringify({accessToken, refreshToken}));
-      dispatch(setAuthenticationTokens({accessToken, refreshToken}));
       dispatch(setIsAuthenticated(true));
-    } catch (e) {
-      console.log(e);
-    }
+    } catch (e) {}
   };
 
   const pushToCreateAccount = () => {
@@ -96,12 +98,13 @@ const Login: React.FC<LoginProps> = ({route, navigation}) => {
             <TextInput
               style={styles.textInput}
               placeholder={'Email'}
-              onChangeText={t => onChangeText(t, 'username')}
+              onChangeText={t => onChangeText(t, 'email')}
               autoCapitalize={'none'}
             />
           </View>
 
-          <View style={styles.textInputContainer}>
+          <View
+            style={[styles.textInputContainer, {marginBottom: PADDING / 2}]}>
             <Icon
               name={'ios-lock-closed'}
               size={22}
@@ -110,14 +113,14 @@ const Login: React.FC<LoginProps> = ({route, navigation}) => {
             />
             <TextInput
               style={styles.textInput}
-              secureTextEntry={isSecure}
+              secureTextEntry={isSecureText}
               placeholder={'Password'}
               onChangeText={t => onChangeText(t, 'password')}
               autoCapitalize={'none'}
             />
             <Pressable onPress={toggleIsSecure} hitSlop={40}>
               <Icon
-                name={isSecure ? 'eye' : 'eye-off'}
+                name={isSecureText ? 'eye' : 'eye-off'}
                 size={22}
                 color={'#9E9EA7'}
               />
@@ -125,10 +128,12 @@ const Login: React.FC<LoginProps> = ({route, navigation}) => {
           </View>
 
           <View>
+            <Text style={styles.forgotPassword}>Forgot password?</Text>
             <Button
               text="Login"
               width={width * 0.9}
-              onPress={signIn}
+              onPress={login}
+              action={'accept'}
               extraStyle={styles.extraStyle}
             />
 
@@ -141,14 +146,7 @@ const Login: React.FC<LoginProps> = ({route, navigation}) => {
           </View>
         </View>
       </View>
-
-      {route.params.createdAccount ? (
-        <Toast
-          type="success"
-          message="Your account has been created successfully"
-          title="Account created!"
-        />
-      ) : null}
+      {accountCreated ? <Toast {...ACCOUNT_CREATED_INFO} /> : null}
     </View>
   );
 };
@@ -157,25 +155,24 @@ const styles = StyleSheet.create({
   root: {
     flex: 1,
     backgroundColor: '#fff',
-    paddingHorizontal: width * 0.05,
+    paddingHorizontal: SPACING,
   },
   loginContainer: {
     flex: 1,
     justifyContent: 'space-between',
     paddingTop: 10,
-    // paddingBottom: statusBarHeight,
+    paddingBottom: SPACING,
   },
   logo: {
-    marginTop: 10,
-    width: width / 2.3,
-    height: width / 2.3,
+    marginTop: SPACING,
+    width: 150,
+    height: 150,
     alignSelf: 'center',
   },
   login: {
     fontFamily: 'UberBold',
     color: '#000',
     fontSize: 22,
-    marginBottom: 10,
   },
   textInputContainer: {
     height: 45,
@@ -184,7 +181,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     backgroundColor: '#F3F3F4',
     borderRadius: 5,
-    marginVertical: 10,
+    marginVertical: PADDING / 2,
     padding: 10,
   },
   icon: {
@@ -193,7 +190,7 @@ const styles = StyleSheet.create({
   textInput: {
     flex: 1,
     height: 45,
-    fontFamily: 'UberBold',
+    fontFamily: 'Uber',
     backgroundColor: '#F3F3F4',
     color: '#C5C8D7',
   },
@@ -201,16 +198,16 @@ const styles = StyleSheet.create({
     fontFamily: 'UberBold',
     color: 'rgba(51, 102, 255, 0.65)',
     alignSelf: 'flex-end',
+    // marginVertical: PADDING / 2,
   },
   extraStyle: {
-    marginVertical: 10,
+    marginVertical: PADDING,
   },
   newToContainer: {
     flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',
     alignSelf: 'center',
-    marginBottom: 20,
   },
   newText: {
     fontFamily: 'UberBold',

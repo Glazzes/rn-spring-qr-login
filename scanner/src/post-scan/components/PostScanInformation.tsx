@@ -1,8 +1,9 @@
 import {Dimensions} from 'react-native';
-import React, {useEffect} from 'react';
-import {Box, Button, Image, StatusBar, Text, VStack} from 'native-base';
+import React from 'react';
+import {Box, Image, StatusBar, Text, VStack} from 'native-base';
 import {NavigationProp, RouteProp} from '@react-navigation/native';
-import {StackScreens} from '../navigation/stackScreens';
+import {StackScreens} from '../../utils/types';
+import Button from '../../utils/components/Button';
 
 const {width, height} = Dimensions.get('window');
 
@@ -21,10 +22,6 @@ const PostScanInformation: React.FC<PostScanInformationProps> = ({
     navigation.navigate('Home');
   };
 
-  useEffect(() => {
-    console.log(information);
-  });
-
   if (!information) {
     return null;
   }
@@ -42,8 +39,8 @@ const PostScanInformation: React.FC<PostScanInformationProps> = ({
       <VStack flex={1} alignItems={'center'} justifyContent={'space-between'}>
         <Box px={'4'}>
           <Text
-            fontSize={'24'}
-            fontWeight={'bold'}
+            fontSize={'22'}
+            fontFamily={'UberBold'}
             color={'#1d1d1d'}
             mb={'2'}
             textAlign={'center'}>
@@ -58,11 +55,11 @@ const PostScanInformation: React.FC<PostScanInformationProps> = ({
           </Text>
         </Box>
         <Button
-          bgColor={'#1d1d1d'}
-          textTransform={'uppercase'}
-          onPress={toHome}>
-          Take me home
-        </Button>
+          text={'Take me home'}
+          width={width * 0.5}
+          onPress={toHome}
+          action={'accept'}
+        />
       </VStack>
     </Box>
   );

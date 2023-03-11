@@ -1,8 +1,9 @@
 import {Dimensions} from 'react-native';
 import React from 'react';
-import {Box, Image, VStack, Text, Button} from 'native-base';
-import {StackScreens} from '../navigation/stackScreens';
+import {Box, Image, VStack, Text} from 'native-base';
 import {NavigationProp} from '@react-navigation/native';
+import Button from '../utils/components/Button';
+import {StackScreens} from '../utils/types';
 
 const {width} = Dimensions.get('window');
 const SIZE = width * 0.9;
@@ -29,8 +30,8 @@ const ScanWarning: React.FC<ScanWarningProps> = ({navigation}) => {
       <VStack flex={1} alignItems={'center'} justifyContent={'space-between'}>
         <Box px={'4'}>
           <Text
-            fontSize={'24'}
-            fontWeight={'bold'}
+            fontSize={'22'}
+            fontFamily={'UberBold'}
             color={'#1d1d1d'}
             mb={'2'}
             textAlign={'center'}>
@@ -45,9 +46,12 @@ const ScanWarning: React.FC<ScanWarningProps> = ({navigation}) => {
             people or your account may be in danger
           </Text>
         </Box>
-        <Button bgColor={'#1d1d1d'} onPress={toScanner}>
-          Scan QR code
-        </Button>
+        <Button
+          text={'SCAN A CODE'}
+          width={width * 0.5}
+          onPress={toScanner}
+          action={'accept'}
+        />
       </VStack>
     </Box>
   );

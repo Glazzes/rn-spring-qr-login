@@ -1,6 +1,7 @@
 export type StackScreens = {
   Login: undefined;
   Home: undefined;
+  NotFound: undefined;
 };
 
 export type User = {

@@ -3,11 +3,11 @@ import {Center, View} from 'native-base';
 import Appbar from './Appbar';
 import {Dimensions, StatusBar, StyleSheet} from 'react-native';
 import {NavigationProp} from '@react-navigation/native';
-import {StackScreens} from '../navigation/stackScreens';
-import Button from '../utils/components/Button';
-import {mmkv} from '../utils/mmkv';
+import Button from '../../utils/components/Button';
+import {mmkv} from '../../utils/mmkv';
 import {useDispatch} from 'react-redux';
-import {setIsAuthenticated} from '../store/slices/authSlice';
+import {setIsAuthenticated} from '../../store/slices/authSlice';
+import {StackScreens} from '../../utils/types';
 
 const {width} = Dimensions.get('window');
 
@@ -24,7 +24,7 @@ const Home: React.FC<HomeProps> = ({navigation}) => {
 
   const logout = async () => {
     mmkv.delete('tokens');
-    dispatch(setIsAuthenticated(true));
+    dispatch(setIsAuthenticated(false));
   };
 
   return (
@@ -39,8 +39,15 @@ const Home: React.FC<HomeProps> = ({navigation}) => {
           text={'Login with QR code'}
           onPress={toWarning}
           width={width * 0.5}
+          action={'accept'}
+          extraStyle={styles.margin}
         />
-        <Button text={'Logout'} onPress={logout} width={width * 0.5} />
+        <Button
+          text={'Logout'}
+          onPress={logout}
+          width={width * 0.5}
+          action={'decline'}
+        />
       </Center>
     </View>
   );
@@ -50,6 +57,9 @@ const styles = StyleSheet.create({
   root: {
     flex: 1,
     backgroundColor: '#fff',
+  },
+  margin: {
+    marginBottom: 16,
   },
 });
 

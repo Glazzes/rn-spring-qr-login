@@ -1,2 +1,2 @@
-export {default as DeviceInformation} from './DeviceInformation';
-export {default as PostScanInformation} from './PostScanInformation';
+export {default as DeviceInformation} from './components/DeviceInformation';
+export {default as PostScanInformation} from './components/PostScanInformation';

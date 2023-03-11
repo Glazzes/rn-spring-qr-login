@@ -1,5 +1,5 @@
-import React, { useEffect } from 'react';
-import { Text } from 'react-native';
+import React, {useEffect} from 'react';
+import {Text} from 'react-native';
 import {NavigationContainer} from '@react-navigation/native';
 import {createStackNavigator} from '@react-navigation/stack';
 import {useSnapshot} from 'valtio';
@@ -7,6 +7,7 @@ import {Login} from './src/login';
 import {Home} from './src/home';
 import {authState, setIsAuthenticated} from './src/utils/authStore';
 import {StackScreens} from './src/utils/types';
+import NotFound from './src/shared/NotFound';
 
 const Stack = createStackNavigator<StackScreens>();
 
@@ -22,12 +23,13 @@ export default function App() {
 
   return (
     <NavigationContainer linking={{
-      prefixes: ['http://localhost:19006', 'http://192.168.100.4:19006'],
+      prefixes: [],
       config: {
         screens: {
           Home: '/me',
-          Login: '/login'
-        }
+          Login: '/login',
+          NotFound: "*"
+        },
       }
     }} fallback={<Text>Loading ...</Text>} >
       <Stack.Navigator initialRouteName={'Login'} screenOptions={{headerShown: false}}>
@@ -36,6 +38,7 @@ export default function App() {
         ) : (
           <Stack.Screen name={'Login'} component={Login} />
         )}
+        <Stack.Screen name={"NotFound"} component={NotFound} />
       </Stack.Navigator>
     </NavigationContainer>
   );

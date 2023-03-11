@@ -26,6 +26,7 @@ type ToastProps = {
   title: string;
   message: string;
   type: NotificationType;
+  onAnimationEnd?: () => void;
 };
 
 const {width} = Dimensions.get('window');
@@ -60,7 +61,12 @@ const information: Color = {
 const TOAST_WIDTH = width * 0.9;
 const DURATION = 10000;
 
-const Toast: React.FC<ToastProps> = ({type, message, title}) => {
+const Toast: React.FC<ToastProps> = ({
+  type,
+  message,
+  title,
+  onAnimationEnd,
+}) => {
   const toastInfo = information[type];
 
   const translateX = useSharedValue<number>(0);
@@ -77,7 +83,15 @@ const Toast: React.FC<ToastProps> = ({type, message, title}) => {
   }));
 
   const hide = () => {
-    translateY.value = withTiming(-(height + Constants.statusBarHeight));
+    translateY.value = withTiming(
+      -(height + Constants.statusBarHeight),
+      undefined,
+      f => {
+        if (f && onAnimationEnd) {
+          runOnJS(onAnimationEnd)();
+        }
+      },
+    );
   };
 
   useEffect(() => {

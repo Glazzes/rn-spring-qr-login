@@ -1,6 +1,6 @@
 web:
   app:
-    image-store: ~/
+    image-store: /home/glaze/
     events:
       display-user: display.user
       perform-login: perform.login

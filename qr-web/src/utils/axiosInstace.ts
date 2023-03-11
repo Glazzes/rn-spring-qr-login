@@ -1,10 +1,11 @@
-import axios, { AxiosError } from 'axios';
-import { setIsAuthenticated } from './authStore';
-import { Tokens } from './types';
-import { apiTokenUrl } from './urls';
+import {API_URL} from '@env';
+import axios, {AxiosError} from 'axios';
+import {setIsAuthenticated} from './authStore';
+import {Tokens} from './types';
+import {apiTokenUrl} from './urls';
 
 export const axiosInstance = axios.create({
-  baseURL: 'http://localhost:8080'
+  baseURL: API_URL
 })
 
 axiosInstance.interceptors.request.use(requestConfig => {

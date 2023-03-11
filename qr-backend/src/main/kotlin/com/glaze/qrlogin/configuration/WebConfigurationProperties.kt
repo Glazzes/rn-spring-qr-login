@@ -6,9 +6,9 @@ import org.springframework.boot.context.properties.ConfigurationProperties
 
 @ConfigurationProperties(prefix = "web.app", ignoreUnknownFields = true)
 data class WebConfigurationProperties(
-    @NotBlank(message = "{web.image-store.required}")
+    @get:NotBlank(message = "{web.image-store.required}")
     val imageStore: String,
 
-    @NotEmpty(message = "{web.origins.required}")
+    @get:NotEmpty(message = "{web.origins.not-empty}")
     val origins: List<String>
 )
