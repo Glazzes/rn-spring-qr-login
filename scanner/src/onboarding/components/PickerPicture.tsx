@@ -5,7 +5,7 @@ import {Asset} from 'expo-media-library';
 import Icon from '@expo/vector-icons/Ionicons';
 import {SharedElement} from 'react-navigation-shared-element';
 import {NavigationProp, useNavigation} from '@react-navigation/native';
-import {StackScreens} from '../../navigation/stackScreens';
+import {StackScreens} from '../../utils/types';
 
 type PickerPictureProps = {
   asset: Asset;

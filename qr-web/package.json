@@ -30,6 +30,7 @@
     "@babel/core": "^7.20.0",
     "@types/react": "~18.0.14",
     "@types/react-native": "^0.71.3",
+    "@types/uuid": "^9.0.1",
     "babel-plugin-react-native-web": "^0.18.12",
     "react-native-dotenv": "^3.4.8",
     "typescript": "^4.9.4"

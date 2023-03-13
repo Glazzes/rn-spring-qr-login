@@ -17,14 +17,16 @@ import {apiAuthLogin} from '../../utils/urls';
 import Button from '../../utils/components/Button';
 import withKeyboard from '../../utils/hoc/withKeyboard';
 import {mmkv} from '../../utils/mmkv';
-import {authState} from '../../store/authStore';
 import {StackScreens, TokenResponse} from '../../utils/types';
 import {NavigationProp, RouteProp} from '@react-navigation/native';
 import Toast from '../../misc/Toast';
 import {ACCOUNT_CREATED_INFO} from '../utils/constants';
 import {PADDING} from '../../utils/constants';
 import {useDispatch} from 'react-redux';
-import {setIsAuthenticated} from '../../store/slices/authSlice';
+import {
+  setAuthenticationTokens,
+  setIsAuthenticated,
+} from '../../store/slices/authSlice';
 
 const SPACING = 16;
 const {width} = Dimensions.get('window');
@@ -65,9 +67,9 @@ const Login: React.FC<LoginProps> = ({route, navigation}) => {
       const accessToken = headers.authorization;
       const refreshToken = headers['refresh-token'];
 
-      authState.tokens = {accessToken, refreshToken};
       mmkv.set('tokens', JSON.stringify({accessToken, refreshToken}));
       dispatch(setIsAuthenticated(true));
+      dispatch(setAuthenticationTokens({accessToken, refreshToken}));
     } catch (e) {}
   };
 

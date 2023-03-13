@@ -1,4 +1,9 @@
 {
   "name": "scanner",
-  "displayName": "Qr scanner"
+  "displayName": "Qr scanner",
+  "extra": {
+    "eas": {
+      "projectId": "14ebf659-0d0d-4d06-963c-0872bf4d1fb6"
+    }
+  }
 }

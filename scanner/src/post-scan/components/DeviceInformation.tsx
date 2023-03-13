@@ -100,7 +100,7 @@ const DeviceInformation: React.FC<DeviceInformationProps> = ({
             Is this your device?
           </Text>
           <Info text={route.params.device} />
-          <Info text={`Ip address ${route.params.ipAddress}`} />
+          <Info text={`Ip address [Censored :D]}`} />
           <Info text={route.params.location} />
         </VStack>
         <VStack>

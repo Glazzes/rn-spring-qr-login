@@ -1,4 +1,5 @@
 /* eslint-disable react/no-unescaped-entities */
+import React, {useCallback, useEffect, useRef, useState} from 'react';
 import {
   View,
   Text,
@@ -8,11 +9,10 @@ import {
   Animated,
   Alert,
 } from 'react-native';
-import React, {useCallback, useEffect, useRef, useState} from 'react';
 import {browserName, browserVersion, osName, osVersion} from 'react-device-detect';
 import {QRCodeSVG} from 'qrcode.react';
 import {v4 as uuid} from 'uuid';
-import axios, { AxiosError } from 'axios';
+import axios, {AxiosError} from 'axios';
 import {DisplayUserEventDTO, QrCode, User} from '../../utils/types';
 import {deleteSourceUrl, getEventSourceUrl, getProfilePictureUrl, qrLogin} from '../../utils/urls';
 import {SIZE} from '../../utils/contants';
@@ -36,6 +36,7 @@ const QrCodeLogin: React.FC = () => {
   const [displayCode, setDisplayCode] = useState<boolean>(true);
   const [user, setUser] = useState<User>(EMPTY_USER);
   const [textTime, setTextTime] = useState<string>('10:00');
+  const [timeInterval, setTimeInterval] = useState<number>();
 
   const [eventSource, setEventSource] = useState(() => {
     const url = getEventSourceUrl(deviceId);
@@ -69,21 +70,23 @@ const QrCodeLogin: React.FC = () => {
     setQrCode((qr) => ({...qr, issuedFor: user.id, mobileId}));
     translateContainer(-1 * SIZE);
 
-    const interval = setInterval(() => {
-      elapsedTime.current += 1;
-      if(elapsedTime.current >= COUNNTDOWN_SECONDS) {
-        elapsedTime.current = 0;
-        clearInterval(interval)
-        setToBaseState();
-        return;
-      }
+    setTimeInterval(() => {
+      const interval = () => setInterval(() => {
+        elapsedTime.current += 1;
+        if(elapsedTime.current >= COUNNTDOWN_SECONDS) {
+          setToBaseState();
+          return;
+        }
+  
+        const acutalTime = COUNNTDOWN_SECONDS - elapsedTime.current;
+        const minutes = Math.floor(acutalTime / 60);
+        const seconds = acutalTime % 60;
+  
+        setTextTime(`${minutes}: ${seconds > 9 ? seconds : '0' + seconds}`)
+      }, 1000)
 
-      const acutalTime = COUNNTDOWN_SECONDS - elapsedTime.current;
-      const minutes = Math.floor(acutalTime / 60);
-      const seconds = acutalTime % 60;
-
-      setTextTime(`${minutes}: ${seconds > 9 ? seconds : '0' + seconds}`)
-    }, 1000)
+      return interval;
+    })
   }
 
   const login = useCallback(() => {
@@ -105,7 +108,12 @@ const QrCodeLogin: React.FC = () => {
   }, [qrCode])
 
   const setToBaseState = async () => {
+    if(timeInterval) {
+      clearInterval(timeInterval);
+    }
+
     elapsedTime.current = 0;
+
     try{
       const url = deleteSourceUrl(qrCode.deviceId);
       await axiosInstance.delete(url)

@@ -12,15 +12,17 @@ import {Provider, useSelector} from 'react-redux';
 import {RootState, store} from './src/store/store';
 import {loadAsync} from 'expo-font';
 import {StackScreens} from './src/utils/types';
-
-// LogBox.ignoreLogs(['[react-native-gesture-handler]']);
+import RNBootSplash from 'react-native-bootsplash';
 
 const Stack = createSharedElementStackNavigator<StackScreens>();
 
 const App: React.FC = () => {
-  // const snap = useSnapshot(authState);
   const [isFontloaded, setIsFontLoaded] = useState<boolean>(false);
   const selector = useSelector((state: RootState) => state.auth);
+
+  const onReady = () => {
+    RNBootSplash.hide({fade: true});
+  };
 
   useEffect(() => {
     // @ts-ignore
@@ -35,7 +37,7 @@ const App: React.FC = () => {
 
   return (
     <NativeBaseProvider>
-      <NavigationContainer>
+      <NavigationContainer onReady={onReady}>
         {selector.isAuthenticated ? (
           <Stack.Navigator
             initialRouteName={'Home'}

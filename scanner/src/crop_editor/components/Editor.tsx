@@ -26,7 +26,6 @@ import {getMaxImageScale} from '../utils/functions/getMaxImageScale';
 import {useVector} from '../../utils/useVector';
 import {clamp} from '../utils/functions/clamp';
 import {pinch} from '../utils/functions/pinch';
-import {StackScreens} from '../../navigation/stackScreens';
 import {
   NavigationProp,
   RouteProp,
@@ -39,6 +38,7 @@ import {useSelector} from 'react-redux';
 import {RootState} from '../../store/store';
 import {axiosInstance} from '../../utils/axiosInstance';
 import {apiUsersUrl} from '../../utils/urls';
+import {StackScreens} from '../../utils/types';
 
 type CropEditorProps = {
   route: RouteProp<StackScreens, 'CropEditor'>;
