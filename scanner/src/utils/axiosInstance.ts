@@ -1,7 +1,7 @@
 // @ts-nocheck
 import axios, {AxiosError} from 'axios';
 import {TokenResponse} from './types';
-import {API_URL as host} from '@env';
+import {API_URL} from '@env';
 import {mmkv} from './mmkv';
 import {apiTokenUrl} from './urls';
 import {
@@ -10,7 +10,7 @@ import {
 } from '../store/slices/authSlice';
 
 const axiosInstance = axios.create({
-  baseURL: host,
+  baseURL: API_URL,
 });
 
 axiosInstance.interceptors.request.use(config => {
@@ -36,7 +36,7 @@ axiosInstance.interceptors.response.use(
         error.config.retry = false;
         const tokens: TokenResponse = JSON.parse(mmkv.getString('tokens')!!);
         const {data} = await axios.post<TokenResponse>(
-          `${host}${apiTokenUrl}`,
+          `${API_URL}${apiTokenUrl}`,
           undefined,
           {
             params: {

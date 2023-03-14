@@ -27,8 +27,14 @@ const accountSlice = createSlice({
     updateField: (state, action: PayloadAction<FieldUpdate>) => {
       state[action.payload.name] = action.payload.value;
     },
+    reset: state => {
+      state.email = '';
+      state.password = '';
+      state.username = '';
+      state.confirmation = '';
+    },
   },
 });
 
-export const {updateField} = accountSlice.actions;
+export const {updateField, reset} = accountSlice.actions;
 export default accountSlice.reducer;

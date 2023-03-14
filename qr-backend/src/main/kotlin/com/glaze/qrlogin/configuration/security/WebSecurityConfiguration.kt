@@ -8,7 +8,6 @@ import com.glaze.qrlogin.configuration.security.providers.QrAuthenticationProvid
 import com.glaze.qrlogin.configuration.security.contracts.RedisUserDetailsService
 import com.glaze.qrlogin.configuration.security.filters.PasswordAuthenticationFilter
 import com.glaze.qrlogin.configuration.security.handlers.CustomLogoutHandler
-import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.security.authentication.AuthenticationManager
@@ -53,7 +52,7 @@ class WebSecurityConfiguration (
             configuration.maxAge = 3600L
             configuration.allowedOrigins = properties.origins
             configuration.allowedHeaders = listOf("*")
-            configuration.exposedHeaders = listOf("Authorization,Refresh-Token")
+            configuration.exposedHeaders = listOf("Authorization, Refresh-Token")
 
             val source = UrlBasedCorsConfigurationSource()
             source.registerCorsConfiguration("/**", configuration)
@@ -74,6 +73,7 @@ class WebSecurityConfiguration (
                     .requestMatchers(
                         "/static/{filename}",
                         "/api/v1/users",
+                        "/api/v1/users/exists",
                         "/api/v1/users/validate",
                         "/api/v1/auth/*",
                         "/api/v1/events/{id}",

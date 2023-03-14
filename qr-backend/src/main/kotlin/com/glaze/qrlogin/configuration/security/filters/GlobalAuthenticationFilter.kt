@@ -24,6 +24,7 @@ class GlobalAuthenticationFilter(
             AntPathRequestMatcher("/api/v1/events/{id}/register"),
             AntPathRequestMatcher("/api/v1/events/{id}"),
             AntPathRequestMatcher("/api/v1/auth/*"),
+            AntPathRequestMatcher("/api/v1/users/exists"),
             AntPathRequestMatcher("/api/v1/users/validate"),
             AntPathRequestMatcher("/api/v1/logout"),
             AntPathRequestMatcher("/api/v1/users", HttpMethod.POST.name()),

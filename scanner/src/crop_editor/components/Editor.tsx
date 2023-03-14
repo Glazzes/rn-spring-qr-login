@@ -5,6 +5,7 @@ import {
   Pressable,
   ActivityIndicator,
   StatusBar,
+  Alert,
 } from 'react-native';
 import React, {useMemo, useState} from 'react';
 import {Gesture, GestureDetector} from 'react-native-gesture-handler';
@@ -34,11 +35,13 @@ import {
 import Svg, {Path} from 'react-native-svg';
 import {set} from '../../utils/animation';
 import {SharedElement} from 'react-navigation-shared-element';
-import {useSelector} from 'react-redux';
+import {useDispatch, useSelector} from 'react-redux';
 import {RootState} from '../../store/store';
 import {axiosInstance} from '../../utils/axiosInstance';
 import {apiUsersUrl} from '../../utils/urls';
 import {StackScreens} from '../../utils/types';
+import {AxiosError} from 'axios';
+import {reset} from '../../store/slices/accountSlice';
 
 type CropEditorProps = {
   route: RouteProp<StackScreens, 'CropEditor'>;
@@ -68,6 +71,7 @@ const CropEditor: React.FC<CropEditorProps> = ({route}) => {
   const navigation =
     useNavigation<NavigationProp<StackScreens, 'CropEditor'>>();
 
+  const dispatch = useDispatch();
   const account = useSelector((state: RootState) => state.account);
 
   const [isCropping, setIsCropping] = useState<boolean>(false);
@@ -237,7 +241,7 @@ const CropEditor: React.FC<CropEditorProps> = ({route}) => {
     };
   });
 
-  const createAccount = (picture: string) => {
+  const createAccount = async (picture: string) => {
     const request = {
       username: account.username,
       password: account.password,
@@ -254,15 +258,21 @@ const CropEditor: React.FC<CropEditorProps> = ({route}) => {
     formData.append('request', JSON.stringify(request));
     formData.append('file', file);
 
-    axiosInstance
-      .post(apiUsersUrl, formData, {
+    try {
+      await axiosInstance.post(apiUsersUrl, formData, {
         headers: {
           'Content-Type': 'multipart/form-data; ',
         },
-      })
-      .then(() => {
-        navigation.navigate('Login', {createdAccount: true});
       });
+
+      navigation.navigate('Login', {createdAccount: true});
+      dispatch(reset());
+    } catch (e) {
+      const response = (e as AxiosError).response;
+      if (response?.status === 500) {
+        Alert.alert('A problem ocurred try again later');
+      }
+    }
   };
 
   const cropImage = async () => {

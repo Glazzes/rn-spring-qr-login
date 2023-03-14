@@ -69,10 +69,14 @@ const DeviceInformation: React.FC<DeviceInformationProps> = ({
     } catch (e) {
       const response = (e as AxiosError).response;
       if (response?.status === 404) {
-        navigation.navigate('Home');
+        navigation.navigate('ScanResult', {
+          information: paths.notFound,
+        });
+
+        return;
       }
 
-      if (response?.status !== 500) {
+      if (response?.status === 500) {
         Alert.alert('Error sending signal to your device');
       }
     }

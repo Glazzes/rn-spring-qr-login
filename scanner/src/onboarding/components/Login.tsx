@@ -20,13 +20,14 @@ import {mmkv} from '../../utils/mmkv';
 import {StackScreens, TokenResponse} from '../../utils/types';
 import {NavigationProp, RouteProp} from '@react-navigation/native';
 import Toast from '../../misc/Toast';
-import {ACCOUNT_CREATED_INFO} from '../utils/constants';
+import {ACCOUNT_CREATED_INFO, INVALID_CREDENTIALS} from '../utils/constants';
 import {PADDING} from '../../utils/constants';
 import {useDispatch} from 'react-redux';
 import {
   setAuthenticationTokens,
   setIsAuthenticated,
 } from '../../store/slices/authSlice';
+import {AxiosError} from 'axios';
 
 const SPACING = 16;
 const {width} = Dimensions.get('window');
@@ -46,7 +47,9 @@ const Login: React.FC<LoginProps> = ({route, navigation}) => {
   const dispatch = useDispatch();
 
   const loginData = useRef<EmailPasswrodLogin>({email: '', password: ''});
+  const [disabled, setDisabled] = useState<boolean>(false);
   const [isSecureText, setIsSecureText] = useState<boolean>(true);
+  const [invalidCredentials, setInvalidCredentials] = useState<boolean>(false);
 
   const toggleIsSecure = async () => {
     await impactAsync(ImpactFeedbackStyle.Light);
@@ -54,10 +57,12 @@ const Login: React.FC<LoginProps> = ({route, navigation}) => {
   };
 
   const onChangeText = (text: string, field: 'email' | 'password') => {
+    setInvalidCredentials(false);
     loginData.current[field] = text;
   };
 
   const login = async () => {
+    setDisabled(true);
     try {
       const {headers} = await axiosInstance.post<TokenResponse>(
         apiAuthLogin,
@@ -70,7 +75,14 @@ const Login: React.FC<LoginProps> = ({route, navigation}) => {
       mmkv.set('tokens', JSON.stringify({accessToken, refreshToken}));
       dispatch(setIsAuthenticated(true));
       dispatch(setAuthenticationTokens({accessToken, refreshToken}));
-    } catch (e) {}
+    } catch (e) {
+      const response = (e as AxiosError).response;
+      if (response?.status === 403) {
+        setInvalidCredentials(true);
+      }
+    } finally {
+      setDisabled(false);
+    }
   };
 
   const pushToCreateAccount = () => {
@@ -136,6 +148,7 @@ const Login: React.FC<LoginProps> = ({route, navigation}) => {
               width={width * 0.9}
               onPress={login}
               action={'accept'}
+              disabled={disabled || invalidCredentials}
               extraStyle={styles.extraStyle}
             />
 
@@ -149,6 +162,12 @@ const Login: React.FC<LoginProps> = ({route, navigation}) => {
         </View>
       </View>
       {accountCreated ? <Toast {...ACCOUNT_CREATED_INFO} /> : null}
+      {invalidCredentials ? (
+        <Toast
+          {...INVALID_CREDENTIALS}
+          onAnimationEnd={() => setInvalidCredentials(false)}
+        />
+      ) : null}
     </View>
   );
 };

@@ -2,7 +2,6 @@ package com.glaze.qrlogin.exception
 
 import io.jsonwebtoken.ExpiredJwtException
 import io.jsonwebtoken.MalformedJwtException
-import org.springframework.boot.autoconfigure.web.servlet.WebMvcProperties.Problemdetails
 import org.springframework.http.HttpStatus
 import org.springframework.http.ProblemDetail
 import org.springframework.http.ResponseEntity

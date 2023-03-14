@@ -25,7 +25,7 @@ class UserController(private val userService: UserService) {
     fun save(
         @RequestParam(value = "file") picture: MultipartFile,
         @RequestParam(value = "request") request: SignUpRequest
-    ) : ResponseEntity<UserDTO> {
+    ): ResponseEntity<UserDTO> {
         val dto = userService.save(request, picture)
         return ResponseEntity.status(HttpStatus.CREATED)
             .body(dto)

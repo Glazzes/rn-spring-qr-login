@@ -98,7 +98,7 @@ const CreateAccount: React.FC<CreateAccountProps> = ({navigation}) => {
             return {...err};
           });
         } catch (e) {}
-      }, 650);
+      }, 500);
 
       // @ts-ignore
       setTimer(newTimer);
@@ -117,25 +117,24 @@ const CreateAccount: React.FC<CreateAccountProps> = ({navigation}) => {
 
     setIsValidating(true);
 
-    const body = {
-      username: select.username,
-      password: select.password,
-      email: select.email,
-    };
+    try {
+      const body = {
+        username: select.username,
+        password: select.password,
+        email: select.email,
+      };
 
-    axiosInstance
-      .post(apiUsersValidateUrl, body)
-      .then(() => {
-        translateY.value = withTiming(-1 * height);
-        setIsValidating(false);
-      })
-      .catch((e: AxiosError) => {
-        const errors = e.response?.data as AccountCreationErrors;
-        delete errors.confirmation;
-
-        setFieldErrors(err => ({...err, errors}));
-        setIsValidating(false);
-      });
+      await axiosInstance.post(apiUsersValidateUrl, body);
+      translateY.value = withTiming(-1 * height);
+    } catch (e) {
+      const response = (e as AxiosError).response;
+      if (response?.status === 400) {
+        const errors = response?.data as AccountCreationErrors;
+        setFieldErrors(err => ({...err, ...errors}));
+      }
+    } finally {
+      setIsValidating(false);
+    }
   };
 
   useEffect(() => {
@@ -301,7 +300,6 @@ const styles = StyleSheet.create({
   root: {
     flex: 1,
     backgroundColor: '#fff',
-    // paddingHorizontal: width * 0.05,
   },
   content: {
     paddingBottom: statusBarHeight,
@@ -358,7 +356,7 @@ const styles = StyleSheet.create({
     marginTop: 10,
   },
   buttonMargin: {
-    marginVertical: 10,
+    marginVertical: 16,
   },
   joinedContainer: {
     flexDirection: 'row',

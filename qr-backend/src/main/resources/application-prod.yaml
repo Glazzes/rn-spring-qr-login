@@ -9,6 +9,7 @@ web:
       - web:3000
       - http://localhost:3000
       - http://140.238.187.124:3000
+      - http://140.238.187.124
 
 spring:
   servlet:

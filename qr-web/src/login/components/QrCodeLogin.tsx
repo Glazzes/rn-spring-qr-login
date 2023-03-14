@@ -1,5 +1,5 @@
 /* eslint-disable react/no-unescaped-entities */
-import React, {useCallback, useEffect, useRef, useState} from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 import {
   View,
   Text,
@@ -36,7 +36,9 @@ const QrCodeLogin: React.FC = () => {
   const [displayCode, setDisplayCode] = useState<boolean>(true);
   const [user, setUser] = useState<User>(EMPTY_USER);
   const [textTime, setTextTime] = useState<string>('10:00');
-  const [timeInterval, setTimeInterval] = useState<number>();
+
+  const [timeInvertal, setTimeInterval] = useState<number>();
+  const [countdownInterval, setCountdownInterval] = useState<number>();
 
   const [eventSource, setEventSource] = useState(() => {
     const url = getEventSourceUrl(deviceId);
@@ -63,16 +65,34 @@ const QrCodeLogin: React.FC = () => {
     Animated.timing(translateX, {toValue, duration: 300, useNativeDriver: false}).start();
   };
 
+  const assignTimeInterval = () => {
+    if(timeInvertal) {
+      clearInterval(timeInvertal);
+    }
+
+    const interval = setInterval(() => {
+      setToBaseState();
+    }, COUNNTDOWN_SECONDS * 1000);
+
+    setTimeInterval(interval);
+  }
+
   const displayCurrentUser = (e: {data: string}) => {
     const {user, mobileId} = JSON.parse(e.data) as DisplayUserEventDTO;
     user.profilePicture = getProfilePictureUrl(user.profilePicture);
+
     setUser(user);
     setQrCode((qr) => ({...qr, issuedFor: user.id, mobileId}));
     translateContainer(-1 * SIZE);
 
-    setTimeInterval(() => {
-      const interval = () => setInterval(() => {
-        elapsedTime.current += 1;
+    if(countdownInterval) {
+      clearInterval(countdownInterval);
+    }
+
+    elapsedTime.current = 0;
+    setCountdownInterval(() => {
+      const interval = setInterval(() => {
+        elapsedTime.current++;
         if(elapsedTime.current >= COUNNTDOWN_SECONDS) {
           setToBaseState();
           return;
@@ -86,33 +106,17 @@ const QrCodeLogin: React.FC = () => {
       }, 1000)
 
       return interval;
-    })
+    });
   }
 
-  const login = useCallback(() => {
-    axiosInstance
-      .post(qrLogin, qrCode)
-      .then(response => {
-        const accessToken = response.headers['authorization'];
-        const refreshToken = response.headers['refresh-token'];
-        console.log(response.headers)
-        if (accessToken && refreshToken) {
-          localStorage.setItem('tokens', JSON.stringify({accessToken, refreshToken}));
-          setAccessToken(accessToken);
-          setIsAuthenticated(true);
-        } else {
-          Alert.alert('Login successfull but no access token was present');
-        }
-      })
-      .catch((e) => console.log(e, 'fail'));
-  }, [qrCode])
-
   const setToBaseState = async () => {
-    if(timeInterval) {
-      clearInterval(timeInterval);
+    if(countdownInterval) {
+      clearInterval(countdownInterval);
     }
 
     elapsedTime.current = 0;
+    assignTimeInterval();
+    setCountdownInterval(undefined);
 
     try{
       const url = deleteSourceUrl(qrCode.deviceId);
@@ -144,6 +148,24 @@ const QrCodeLogin: React.FC = () => {
     }
   }
 
+  const login = () => {
+    axiosInstance
+      .post(qrLogin, qrCode)
+      .then(response => {
+        const accessToken = response.headers['authorization'];
+        const refreshToken = response.headers['refresh-token'];
+ 
+        if (accessToken && refreshToken) {
+          localStorage.setItem('tokens', JSON.stringify({accessToken, refreshToken}));
+          setAccessToken(accessToken);
+          setIsAuthenticated(true);
+        } else {
+          Alert.alert('Login successfull but no access token was present');
+        }
+      })
+      .catch((e) => console.log(e, 'fail'));
+  }
+
   useEffect(() => {
     eventSource.addEventListener(Events.DISPLAY_USER, displayCurrentUser);
     eventSource.addEventListener(Events.PERFORM_LOGIN, login);
@@ -155,6 +177,10 @@ const QrCodeLogin: React.FC = () => {
       eventSource.removeEventListener(Events.CANCEL_LOGIN, setToBaseState);
     }
   }, [eventSource, login]);
+
+  useEffect(() => {
+    assignTimeInterval();
+  }, [])
 
   useEffect(() => {
     axios
