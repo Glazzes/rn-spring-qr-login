@@ -1,12 +1,26 @@
 ## React native + Spring boot qr code login
 
-https://user-images.githubusercontent.com/52082794/189234837-29d34d7a-4f62-478f-b4e3-6f357303d282.mp4
+> :warning:  If you see "mime type not found" reload this page, it brokes sometimes
+
+https://user-images.githubusercontent.com/52082794/225158202-0159274c-f8ca-457d-8085-cf379022afeb.mp4
 
 ### About
+This project consists of the three following projects:
+- [Scanner](https://github.com/Glazzes/rn-spring-qr-login/tree/main/scanner) is a react native mobile app that allows you to create user accounts, login with email/password or login by scanning codes
+- [Web](https://github.com/Glazzes/rn-spring-qr-login/tree/main/qr-web) is a react native web based app that allows users to login by email/password or login by scanning a qr code with [Scanner](https://github.com/Glazzes/rn-spring-qr-login/tree/main/scanner)
+- [Backend](https://github.com/Glazzes/rn-spring-qr-login/tree/main/qr-backend) is a spring boot based backend with a custom authentication flow, this one is built with the building blocks provided by spring security's architecture
 
-This project has been done with building custom authentication flows in mind as spring security's architecture offers the necesary building blocks to create these with ease.
+### Technologies used
+- Redis
+- Spring boot
+- React native / React native web
+- Docker
+- Oracle cloud
 
-### How it works?
+### Try it out live!
+You can find the website at this url http://140.238.187.124/login (I do not own a domain, neither access to a play store account, sorry)
+
+### How does it works?
 
 On the browser we make use of browser's [EventSource](https://developer.mozilla.org/es/docs/Web/API/EventSource) class in order to have unidirectional events beetwen the server and the browser.
 
@@ -24,39 +38,22 @@ There're some things to keep in mind:
 
 ### Build
 
-In order to run this project you'll need [Docker](https://www.docker.com/), [Java 17](https://docs.aws.amazon.com/corretto/latest/corretto-17-ug/downloads-list.html) and set up a react native environment, you follow this [guide](https://reactnative.dev/docs/environment-setup)
-
-First you must package the backend with the following command:
-
-```
-$ ./qr-backend/gradlew bootJar
+For a local enviroment testing set up, run the following command:
+```bash
+docker compose up -f docker-compose-local.yml -d
 ```
 
-Once the backend is packaged, you'll start all the necesary services with following command: (this process can take a while)
+You should find the apps at the following ports:
+- Web at `3000`
+- Backend at `8080`
+- Redis at `6379`
 
-```
-$ docker-compose up -d
-```
+Scanner app must be built by yourself, you must have the following programs already set up in your machine:
+- [Java 17](https://docs.aws.amazon.com/corretto/latest/corretto-17-ug/downloads-list.html)
+- [NodeJs](https://nodejs.org/en/)
+- [Follow this guide](https://reactnative.dev/docs/environment-setup)
 
-Now the mobile app, your computer and your smartphone must be connected to the same network, with that done, go to the network settings of your computer and look for the ipv4 ip address, now replace the ip on `./qr-web/src/utils/urls.ts` file with the one of your computer, connect your device to your computer and run:
-
-```
-node
-$ npx react-native run android
-
-yarn
-$ yarn run android
-```
-
-Once all services are up and running you can find on the following ports
-- 19006 for web
-- 8080 for backend
-
-As the last step, you must create an user by sending a request to `http://localhost:8080/api/v1/users` with the following schema:
-```json
-{
-    "username": "your username",
-    "password:": "your password",
-    "email": "some@email.com"
-}
+With all of the previous stuff done, change the host on [this file](https://github.com/Glazzes/rn-spring-qr-login/tree/main/scanner) for the ipv4 ip address of your computer, for instance change `localhost` to `192.168.100.32`, the run the following command inside scanner folder:
+```bash
+cd android && ./gradlew assembleRelease
 ```
