@@ -24,38 +24,25 @@ const EmailPasswordLogin = () => {
     setData(prev => ({...prev, [field]: text}));
   }
 
-  const login = () => {
+  const login = async () => {
     setDisabled(true);
-    axiosInstance
-      .post(apiAuthLogin, data)
-      .then(response => {
-        const accessToken = response.headers['authorization'];
-        const refreshToken = response.headers['refresh-token'];
-        console.log(response.headers)
-        if (accessToken && refreshToken) {
-          localStorage.setItem('tokens', JSON.stringify({accessToken, refreshToken}));
-          setAccessToken(accessToken);
-          setIsAuthenticated(true);
-        } else {
-          Alert.alert('Login successfull but no access token was present');
-        }
-      })
-      .catch((e) => {
-        console.log(e.response)
-        const response = (e as AxiosError).response;
-        if(!response) {
-          return;
-        }
 
-        if(response.status === 400) {
-          setError(response.data as LoginErors);
-        }
+    try {
+      const {headers} = await axiosInstance.post(apiAuthLogin, data);
+      const accessToken = headers['authorization'];
+      const refreshToken = headers['refresh-token'];
 
-        if(response.status === 403) {
-          setIsInvalidCredentails(true);
-        }
-      })
-      .finally(() => setDisabled(false));
+      localStorage.setItem("tokens", JSON.stringify({accessToken, refreshToken}));
+      setAccessToken(accessToken);
+      setIsAuthenticated(true);
+    }catch(e) {
+      const response = (e as AxiosError).response;
+      if (response?.status === 403) {
+        setIsInvalidCredentails(true);
+      }
+    }finally {
+      setDisabled(false);
+    }
   };
 
   return (

@@ -57,8 +57,8 @@ const Login: React.FC<LoginProps> = ({route, navigation}) => {
   };
 
   const onChangeText = (text: string, field: 'email' | 'password') => {
-    setInvalidCredentials(false);
     loginData.current[field] = text;
+    setDisabled(false);
   };
 
   const login = async () => {
@@ -148,7 +148,7 @@ const Login: React.FC<LoginProps> = ({route, navigation}) => {
               width={width * 0.9}
               onPress={login}
               action={'accept'}
-              disabled={disabled || invalidCredentials}
+              disabled={disabled}
               extraStyle={styles.extraStyle}
             />
 
