@@ -8,7 +8,7 @@ services:
       - "6379:6379"
 
   backend:
-    image: glazee/qr-backend
+    image: glazee/qr-backend:local
     container_name: backend
     ports:
       - "8080:8080"
@@ -18,7 +18,7 @@ services:
   web:
     image: glazee/qr-web
     container_name: web
-    ports:
-      - "3000:80"
     depends_on:
       - backend
+    ports:
+      - "3000:80"

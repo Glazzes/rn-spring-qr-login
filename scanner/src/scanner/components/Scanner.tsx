@@ -1,4 +1,9 @@
-import {AppState, Dimensions, StatusBar, StyleSheet} from 'react-native';
+import {
+  AppState,
+  StatusBar,
+  StyleSheet,
+  useWindowDimensions,
+} from 'react-native';
 import React, {useState, useEffect, useRef} from 'react';
 import {Camera as VCamera, useCameraDevices} from 'react-native-vision-camera';
 import {BarcodeFormat, useScanBarcodes} from 'vision-camera-code-scanner';
@@ -21,14 +26,15 @@ import {AxiosError} from 'axios';
 import {ScanStatus} from '../utils/types';
 import CameraWrapper from './CameraWrapper';
 
-const {width, height} = Dimensions.get('window');
-
 const Scanner: React.FC = () => {
+  const {width, height} = useWindowDimensions();
+
   const selector = useSelector((state: RootState) => state);
   const navigation = useNavigation<NavigationProp<StackScreens, 'Scanner'>>();
 
   const isScanning = useRef<boolean>(false);
   const [active, setActive] = useState<boolean>(true);
+  const [hasPermission, setHasPermission] = useState<boolean>(false);
   const [scanStatus, setScanStatus] = useState<ScanStatus | undefined>();
 
   const devices = useCameraDevices();
@@ -66,6 +72,12 @@ const Scanner: React.FC = () => {
       isScanning.current = false;
     }
   };
+
+  useEffect(() => {
+    VCamera.requestCameraPermission().then(result => {
+      setHasPermission(result === 'authorized');
+    });
+  }, []);
 
   useEffect(() => {
     if (codes[0] !== undefined && !isScanning.current) {
@@ -115,9 +127,13 @@ const Scanner: React.FC = () => {
     return null;
   }
 
+  if (!hasPermission) {
+    return null;
+  }
+
   return (
     <View style={styles.root}>
-      <StatusBar backgroundColor={'#000'} />
+      <StatusBar translucent={true} />
       <CameraWrapper>
         <VCamera
           device={devices.back}

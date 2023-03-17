@@ -1,4 +1,8 @@
+import {Dimensions} from 'react-native';
 import {ScanStatus} from '../../scanner/utils/types';
+
+const {width} = Dimensions.get('window');
+export const IMAGE_SIZE = width / 2;
 
 export const ACCOUNT_CREATED_INFO: ScanStatus = {
   title: 'Account created!',

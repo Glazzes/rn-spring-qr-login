@@ -2,7 +2,7 @@ import React, {useEffect} from 'react';
 import {apiUsersMeUrl, getProfilePictureUrl} from '../../utils/urls';
 import {useDispatch, useSelector} from 'react-redux';
 import {RootState} from '../../store/store';
-import {View, Dimensions, Image, StyleSheet, Text} from 'react-native';
+import {View, Image, StyleSheet, Text} from 'react-native';
 import Constants from 'expo-constants';
 import {PADDING} from '../../utils/constants';
 import {axiosInstance} from '../../utils/axiosInstance';
@@ -10,8 +10,6 @@ import {User} from '../../utils/types';
 import {setCurrentUser} from '../../store/slices/authSlice';
 
 const IMAGE_SIZE = 40;
-
-const {width} = Dimensions.get('window');
 
 const Appbar: React.FC = () => {
   const dispatch = useDispatch();
@@ -51,7 +49,7 @@ const Appbar: React.FC = () => {
 const styles = StyleSheet.create({
   appbar: {
     height: Constants.statusBarHeight * 2,
-    width: width,
+    width: '100%',
     paddingHorizontal: PADDING,
     flexDirection: 'row',
     justifyContent: 'space-between',

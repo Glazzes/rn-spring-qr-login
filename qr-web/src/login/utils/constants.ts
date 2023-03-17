@@ -1,1 +1,1 @@
-export const COUNNTDOWN_SECONDS = 600;
+export const COUNNTDOWN_SECONDS = 300;

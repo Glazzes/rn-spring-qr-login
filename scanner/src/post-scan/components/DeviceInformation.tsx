@@ -8,6 +8,7 @@ import Info from './Info';
 import {axiosInstance} from '../../utils/axiosInstance';
 import {AxiosError} from 'axios';
 import Button from '../../utils/components/Button';
+import withBlockedReturn from '../../utils/hoc/withBlockedReturn';
 
 const {width} = Dimensions.get('window');
 const found = require('../../assets/found.png');
@@ -15,13 +16,13 @@ const found = require('../../assets/found.png');
 const paths: {[id: string]: Information} = {
   success: {
     image: require('../../assets/scan-success.png'),
-    alt: 'Cat took over your phone',
+    alt: 'Trophy',
     title: 'You are logged in!',
     info: 'We have logged you into your other device successfully!',
   },
   notFound: {
     image: require('../../assets/not-found.png'),
-    alt: 'Cat is looking at an empty bowl',
+    alt: 'Telescope on window, aimming at some planets',
     title: 'Missing device',
     info: 'We could not log you into your device, you may have taken too long or there was not such device in first place',
   },
@@ -83,7 +84,12 @@ const DeviceInformation: React.FC<DeviceInformationProps> = ({
   };
 
   return (
-    <Box flex={1} py={'4'} bg={'#fff'} alignItems={'center'}>
+    <Box
+      flex={1}
+      py={'4'}
+      bg={'#fff'}
+      justifyContent={'center'}
+      alignItems={'center'}>
       <StatusBar backgroundColor={'#fff'} barStyle={'light-content'} />
       <Image
         source={found}
@@ -92,7 +98,7 @@ const DeviceInformation: React.FC<DeviceInformationProps> = ({
         resizeMode={'contain'}
         alt={'Phone, megaphone and a tablet'}
       />
-      <VStack flex={1} justifyContent={'space-between'} alignItems={'center'}>
+      <VStack justifyContent={'center'} alignItems={'center'}>
         <VStack>
           <Text
             fontSize={'22'}
@@ -104,7 +110,7 @@ const DeviceInformation: React.FC<DeviceInformationProps> = ({
             Is this your device?
           </Text>
           <Info text={route.params.device} />
-          <Info text={`Ip address [Censored :D]}`} />
+          <Info text={`Ip address ${route.params.ipAddress}`} />
           <Info text={route.params.location} />
         </VStack>
         <VStack>
@@ -129,8 +135,8 @@ const DeviceInformation: React.FC<DeviceInformationProps> = ({
 
 const styles = StyleSheet.create({
   margin: {
-    marginBottom: 16,
+    marginVertical: 16,
   },
 });
 
-export default DeviceInformation;
+export default withBlockedReturn(DeviceInformation);

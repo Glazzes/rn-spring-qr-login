@@ -17,20 +17,23 @@ import {apiAuthLogin} from '../../utils/urls';
 import Button from '../../utils/components/Button';
 import withKeyboard from '../../utils/hoc/withKeyboard';
 import {mmkv} from '../../utils/mmkv';
-import {StackScreens, TokenResponse} from '../../utils/types';
+import {StackScreens} from '../../utils/types';
 import {NavigationProp, RouteProp} from '@react-navigation/native';
 import Toast from '../../misc/Toast';
-import {ACCOUNT_CREATED_INFO, INVALID_CREDENTIALS} from '../utils/constants';
+import {
+  ACCOUNT_CREATED_INFO,
+  IMAGE_SIZE,
+  INVALID_CREDENTIALS,
+} from '../utils/constants';
 import {PADDING} from '../../utils/constants';
 import {useDispatch} from 'react-redux';
 import {
   setAuthenticationTokens,
   setIsAuthenticated,
 } from '../../store/slices/authSlice';
-import {AxiosError} from 'axios';
 
-const SPACING = 16;
 const {width} = Dimensions.get('window');
+const SPACING = 16;
 
 type EmailPasswrodLogin = {
   email: string;
@@ -63,8 +66,9 @@ const Login: React.FC<LoginProps> = ({route, navigation}) => {
 
   const login = async () => {
     setDisabled(true);
+
     try {
-      const {headers} = await axiosInstance.post<TokenResponse>(
+      const {headers} = await axiosInstance.post(
         apiAuthLogin,
         loginData.current,
       );
@@ -76,10 +80,7 @@ const Login: React.FC<LoginProps> = ({route, navigation}) => {
       dispatch(setIsAuthenticated(true));
       dispatch(setAuthenticationTokens({accessToken, refreshToken}));
     } catch (e) {
-      const response = (e as AxiosError).response;
-      if (response?.status === 403) {
-        setInvalidCredentials(true);
-      }
+      setInvalidCredentials(true);
     } finally {
       setDisabled(false);
     }
@@ -180,14 +181,15 @@ const styles = StyleSheet.create({
   },
   loginContainer: {
     flex: 1,
-    justifyContent: 'space-between',
+    justifyContent: 'center',
+    alignItems: 'center',
     paddingTop: 10,
     paddingBottom: SPACING,
   },
   logo: {
-    marginTop: SPACING,
-    width: 150,
-    height: 150,
+    marginBottom: SPACING,
+    width: IMAGE_SIZE,
+    height: IMAGE_SIZE,
     alignSelf: 'center',
   },
   login: {
@@ -196,17 +198,17 @@ const styles = StyleSheet.create({
     fontSize: 22,
   },
   textInputContainer: {
-    height: 45,
+    height: 44,
     width: width * 0.9,
     flexDirection: 'row',
     alignItems: 'center',
     backgroundColor: '#F3F3F4',
     borderRadius: 5,
     marginVertical: PADDING / 2,
-    padding: 10,
+    paddingHorizontal: SPACING,
   },
   icon: {
-    marginRight: 10,
+    marginRight: 8,
   },
   textInput: {
     flex: 1,
@@ -219,7 +221,7 @@ const styles = StyleSheet.create({
     fontFamily: 'UberBold',
     color: 'rgba(51, 102, 255, 0.65)',
     alignSelf: 'flex-end',
-    // marginVertical: PADDING / 2,
+    marginTop: 8,
   },
   extraStyle: {
     marginVertical: PADDING,

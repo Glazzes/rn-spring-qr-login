@@ -4,8 +4,9 @@ import {Box, Image, StatusBar, Text, VStack} from 'native-base';
 import {NavigationProp, RouteProp} from '@react-navigation/native';
 import {StackScreens} from '../../utils/types';
 import Button from '../../utils/components/Button';
+import withBlockedReturn from '../../utils/hoc/withBlockedReturn';
 
-const {width, height} = Dimensions.get('window');
+const {width} = Dimensions.get('window');
 
 type PostScanInformationProps = {
   navigation: NavigationProp<StackScreens, 'ScanResult'>;
@@ -27,17 +28,22 @@ const PostScanInformation: React.FC<PostScanInformationProps> = ({
   }
 
   return (
-    <Box flex={1} py={'4'} bg={'#fff'} alignItems={'center'}>
+    <Box
+      flex={1}
+      py={'4'}
+      bg={'#fff'}
+      justifyContent={'center'}
+      alignItems={'center'}>
       <StatusBar backgroundColor={'rgba(0, 0, 0, 0.2)'} />
       <Image
         alt={information.alt}
         source={information.image}
-        width={width}
-        height={height / 2}
+        width={width - 60}
+        height={width - 60}
         resizeMode={'contain'}
       />
-      <VStack flex={1} alignItems={'center'} justifyContent={'space-between'}>
-        <Box px={'4'}>
+      <VStack alignItems={'center'} justifyContent={'center'}>
+        <Box px={4}>
           <Text
             fontSize={'22'}
             fontFamily={'UberBold'}
@@ -50,7 +56,8 @@ const PostScanInformation: React.FC<PostScanInformationProps> = ({
             textAlign={'center'}
             color={'#4e4e4e'}
             fontSize={'14'}
-            fontWeight={'semibold'}>
+            fontWeight={'semibold'}
+            mb={'6'}>
             {information.info}
           </Text>
         </Box>
@@ -65,4 +72,4 @@ const PostScanInformation: React.FC<PostScanInformationProps> = ({
   );
 };
 
-export default PostScanInformation;
+export default withBlockedReturn(PostScanInformation);

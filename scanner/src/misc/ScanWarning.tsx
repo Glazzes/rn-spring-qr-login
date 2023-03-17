@@ -27,7 +27,7 @@ const ScanWarning: React.FC<ScanWarningProps> = ({navigation}) => {
         resizeMode={'contain'}
         alt={'Cat guides you to another dimension'}
       />
-      <VStack flex={1} alignItems={'center'} justifyContent={'space-between'}>
+      <VStack flex={1} alignItems={'center'}>
         <Box px={'4'}>
           <Text
             fontSize={'22'}
@@ -38,6 +38,7 @@ const ScanWarning: React.FC<ScanWarningProps> = ({navigation}) => {
             Before you go!
           </Text>
           <Text
+            mb={4}
             textAlign={'center'}
             color={'#4e4e4e'}
             fontSize={'14'}
