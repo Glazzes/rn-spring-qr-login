@@ -4,7 +4,7 @@ import org.springframework.data.annotation.Id
 import org.springframework.data.redis.core.RedisHash
 import org.springframework.data.redis.core.index.Indexed
 
-@RedisHash(value = "qr-codes", timeToLive = 600 * 1000)
+@RedisHash(value = "qr-codes", timeToLive = 300)
 class QrCode (
     @Id var id: String? = null,
     @Indexed var issuedFor: String,
