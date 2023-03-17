@@ -57,7 +57,7 @@ Scanner app must be built by yourself, you must have the following programs alre
 - [NodeJs](https://nodejs.org/en/)
 - [A react native enviroment already set up](https://reactnative.dev/docs/environment-setup)
 
-With all of the previous stuff done, change the host on [this file](https://github.com/Glazzes/rn-spring-qr-login/tree/main/scanner/.env.proudction) for the ipv4 ip address of your computer, for instance change `localhost` to `192.168.100.32`, then run the following command inside scanner folder:
+With all of the previous stuff done, change the host on [this file](https://github.com/Glazzes/rn-spring-qr-login/blob/main/scanner/.env.production) for the ipv4 ip address of your computer, for instance change `localhost` to `192.168.100.32`, then run the following command inside scanner folder:
 ```bash
 cd android && ./gradlew assembleRelease
 ```
