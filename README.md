@@ -22,7 +22,7 @@ All animations have been created manually, that includes the scrollable bottom s
 - Oracle cloud
 
 ### Try it out live!
-You can find the website at this url http://140.238.187.124/login, for the app, you can download the apk at the root of this repository or just [click here]() (I do not own a domain, neither access to a play store account, sorry for the inconvinience)
+You can find the website at this url http://140.238.187.124/login, for the app, you can download the apk at the root of this repository or just [click here](https://github.com/Glazzes/rn-spring-qr-login/raw/main/app-release.apk) (I do not own a domain, neither access to a play store account, sorry for the inconvinience)
 
 ### How does it works?
 
