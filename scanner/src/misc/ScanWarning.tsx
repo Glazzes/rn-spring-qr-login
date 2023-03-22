@@ -6,8 +6,7 @@ import Button from '../utils/components/Button';
 import {StackScreens} from '../utils/types';
 
 const {width} = Dimensions.get('window');
-const SIZE = width * 0.9;
-const gateway = require('../assets/gateway.png');
+const SIZE = width * 0.8;
 
 type ScanWarningProps = {
   navigation: NavigationProp<StackScreens, 'Warning'>;
@@ -19,15 +18,20 @@ const ScanWarning: React.FC<ScanWarningProps> = ({navigation}) => {
   };
 
   return (
-    <Box flex={1} py={'4'} bg={'#fff'} alignItems={'center'}>
+    <Box
+      flex={1}
+      py={'4'}
+      bg={'#fff'}
+      justifyContent={'center'}
+      alignItems={'center'}>
       <Image
-        source={gateway}
+        source={require('../assets/gateway.png')}
         width={SIZE}
         height={SIZE}
         resizeMode={'contain'}
         alt={'Cat guides you to another dimension'}
       />
-      <VStack flex={1} alignItems={'center'}>
+      <VStack alignItems={'center'}>
         <Box px={'4'}>
           <Text
             fontSize={'22'}
