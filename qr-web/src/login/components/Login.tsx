@@ -1,31 +1,38 @@
 import React from 'react';
 
-import {View, StyleSheet, Image, Text, useWindowDimensions} from 'react-native';
+import {View, StyleSheet, useWindowDimensions, Pressable, Text} from 'react-native';
 import EmailPasswordLogin from './EmailPasswordLogin';
 import Footer from '../../shared/Footer';
 import IonIcons from '@expo/vector-icons/Ionicons';
 import QrCodeLogin from './QrCodeLogin';
+import {NavigationProp} from '@react-navigation/native';
+import {StackScreens} from '../../utils/types';
 
-const Login: React.FC = () => {
+type LoginProps = {
+  navigation: NavigationProp<StackScreens, 'Login'>;
+}
+
+const Login: React.FC<LoginProps> = ({navigation}) => {
   const {width, height} = useWindowDimensions();
   const isPortait = height > width;
 
   return (
-    <View style={styles.root}>
-      <View style={styles.appbar}>
-        <View style={{flexDirection: "row", alignItems: "center"}}>
-          <Image source={require("../../../assets/react.png")} style={styles.image} />
-          <Text style={styles.title}>React Native Spring Boot QR Login</Text>
+    <View style={{flex: 1}}>
+      <View style={styles.root}>
+        <View style={{alignItems: "center"}}>
+          <View style={{flexDirection: "row"}}>
+            <EmailPasswordLogin />
+            <QrCodeLogin />
+          </View>
+          <Pressable style={styles.button} onPress={() => {
+            navigation.navigate('Modal')
+          }}>
+            <IonIcons name={"logo-android"} color={"#fff"} size={24} />
+            <Text style={styles.text}>Get the app</Text>
+          </Pressable>
         </View>
-        <a href="https://github.com/Glazzes/rn-spring-qr-login" target={"_blank"} style={{textDecorationLine: "none"}} >
-          <IonIcons name="ios-logo-github" color={"#3366ff"} size={30} />
-        </a>
       </View>
-      <View style={isPortait ? styles.rootPortrait : styles.rootLandscape}>
-        <EmailPasswordLogin />
-        <QrCodeLogin />
-      </View>
-      <Footer />
+    <Footer />
     </View>
   );
 };
@@ -33,38 +40,30 @@ const Login: React.FC = () => {
 const styles = StyleSheet.create({
   root: {
     flex: 1,
-    backgroundColor: "#fff",
-    justifyContent: "space-between",
+    justifyContent: "center",
     alignItems: "center"
   },
-  appbar: {
-    height: 62,
-    width: "100%",
-    paddingHorizontal: 16,
-    shadowColor: "rgba(0, 0, 0, 0.5)",
-    shadowRadius: 1,
+  button: {
+    maxWidth: 180,
+    backgroundColor: "#00de7a",
+    padding: 8,
+    borderRadius: 4,
     flexDirection: "row",
     alignItems: "center",
-    justifyContent: "space-between"
+    justifyContent: "center"
   },
-  image: {
-    height: 40,
-    width: 40,
-  },
-  title: {
+  text: {
     fontFamily: "ExtraBold",
-    fontSize: 20,
+    color: "#fff",
     marginLeft: 16
   },
   rootPortrait: {
     flex: 1,
-    backgroundColor: '#fff',
     justifyContent: 'center',
     alignItems: 'center',
   },
   rootLandscape: {
-    
-    backgroundColor: '#fff',
+    flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
     flexDirection: 'row',

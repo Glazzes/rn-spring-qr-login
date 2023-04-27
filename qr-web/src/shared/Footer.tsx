@@ -25,6 +25,7 @@ const Footer = () => {
 
 const styles = StyleSheet.create({
   row: {
+    backgroundColor: "#fff",
     flexDirection: "row",
     justifyContent: 'center',
     alignItems: 'center',

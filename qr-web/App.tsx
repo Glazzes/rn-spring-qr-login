@@ -9,6 +9,7 @@ import {authState, setIsAuthenticated} from './src/utils/authStore';
 import {StackScreens} from './src/utils/types';
 import NotFound from './src/shared/NotFound';
 import {useFonts} from 'expo-font';
+import Modal from './src/shared/Modal';
 
 const Stack = createStackNavigator<StackScreens>();
 
@@ -46,11 +47,24 @@ export default function App() {
         },
       }
     }} fallback={<Text>Loading ...</Text>} >
-      <Stack.Navigator initialRouteName={'Login'} screenOptions={{headerShown: false}}>
+      <Stack.Navigator initialRouteName={'Login'} screenOptions={{
+        headerShown: false,
+        cardStyle: {
+          backgroundColor: "#fff"
+        }
+      }}>
         {state.isAuthenticated ? (
           <Stack.Screen name={'Home'} component={Home} />
         ) : (
-          <Stack.Screen name={'Login'} component={Login} />
+          <>
+            <Stack.Screen name={'Login'} component={Login} />
+            <Stack.Screen name={'Modal'} component={Modal} options={{
+              presentation: "transparentModal",
+              cardStyle: {
+                backgroundColor: "transparent"
+              }
+            }} />
+          </>
         )}
         <Stack.Screen name={"NotFound"} component={NotFound} />
       </Stack.Navigator>
@@ -61,7 +75,6 @@ export default function App() {
 const styles = StyleSheet.create({
   root: {
     flex: 1,
-    backgroundColor: '#fff',
     justifyContent: 'center',
     alignItems: 'center',
   },

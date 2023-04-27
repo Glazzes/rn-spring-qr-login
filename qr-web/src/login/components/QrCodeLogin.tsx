@@ -183,9 +183,9 @@ const QrCodeLogin: React.FC = () => {
   }, [])
 
   useEffect(() => {
-    axios
-      .get('https://ipapi.co/json/')
-      .then(({data}) => {
+    const fetchUserIp = async () => {
+      try{
+      const {data} = await axios.get('https://ipapi.co/json/');
         setQrCode((qr) => ({
           ...qr,
           ipAddress: data.ip,
@@ -193,8 +193,14 @@ const QrCodeLogin: React.FC = () => {
         }));
 
         setDisplayCode(true);
-      })
-      .catch((e) => console.log(e));
+      }catch(e) {
+        const response = (e as AxiosError).response;
+        console.log(response);
+      }
+    }
+
+    fetchUserIp();
+    
   }, []);
 
   return (
@@ -218,7 +224,7 @@ const QrCodeLogin: React.FC = () => {
                 }}
               />
               </View>
-            ): null}
+            ): <ActivityIndicator size={"large"} color={"#3366ff"} />}
         </View>
 
         <View style={styles.container}>
