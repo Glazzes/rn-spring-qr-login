@@ -35,7 +35,7 @@ const QrCodeLogin: React.FC = () => {
 
   const [displayCode, setDisplayCode] = useState<boolean>(true);
   const [user, setUser] = useState<User>(EMPTY_USER);
-  const [textTime, setTextTime] = useState<string>('10:00');
+  const [textTime, setTextTime] = useState<string>('5:00');
 
   const [timeInvertal, setTimeInterval] = useState<number>();
   const [countdownInterval, setCountdownInterval] = useState<number>();
@@ -198,64 +198,83 @@ const QrCodeLogin: React.FC = () => {
   }, []);
 
   return (
-    <View style={styles.topContainer}>
-      <Animated.View style={[styles.root, {transform: [{translateX}]}]}>
-        <View style={styles.qrContainer}>
+    <View style={styles.root}>
+      <Animated.View style={[styles.animationContainer, {transform: [{translateX}]}]}>
+        <View style={styles.container}>
+          <Text style={styles.title}>Scan QR Code</Text>
+          <Text style={styles.subtitle}>Scan this QR code with the mobile app to login!</Text>
           {displayCode ? (
-            <QRCodeSVG
-              value={JSON.stringify(qrCode)}
-              size={SIZE - 30}
-              includeMargin={true}
-              fgColor={'#2C3639'}
-              imageSettings={{
-                src: require('../../../assets/react.png'),
-                height: 60,
-                width: 60,
-                excavate: false
-              }}
-            />
-          ) : (
-            <View style={styles.placeHolder}>
-              <ActivityIndicator color={'#2C3639'} size={50} />
-            </View>
-          )}
-          <Text style={[styles.text, {marginTop: 10}]}>Scan this qr with our mobile app to login!</Text>
+              <View style={styles.qrWrapper}>
+                <QRCodeSVG
+                value={JSON.stringify(qrCode)}
+                size={200 - 8}
+                includeMargin={false}
+                fgColor={'#2C3639'}
+                imageSettings={{
+                  src: require('../../../assets/react.png'),
+                  height: 60,
+                  width: 60,
+                  excavate: false
+                }}
+              />
+              </View>
+            ): null}
         </View>
 
-        <View style={styles.infoContainer}>
+        <View style={styles.container}>
           <Image
-            source={{uri: user.profilePicture}}
-            resizeMode={'cover'}
-            style={styles.picture}
-          />
-          <Text style={styles.text}>
-            You're logging in as <Text style={styles.username}>{user.username}</Text>
-          </Text>
-          <Text style={[styles.text, styles.margin]}>{textTime}</Text>
-          <Button action={'decline'} text={'This is not me'} onPress={setToBaseState} width={SIZE} />
-        </View>
+              source={{uri: user.profilePicture}}
+              resizeMode={'cover'}
+              style={styles.picture}
+            />
+            <Text style={styles.text}>
+              You're logging in as <Text style={styles.username}>{user.username}</Text>
+            </Text>
+            <Text style={[styles.text, styles.margin]}>{textTime}</Text>
+            <Button action={'decline'} text={'This is not me'} onPress={setToBaseState} width={SIZE * 0.8} />
+          </View>
       </Animated.View>
     </View>
   );
 };
 
 const styles = StyleSheet.create({
-  topContainer: {
-    height: SIZE,
-    width: SIZE,
-    overflow: 'hidden',
-  },
   root: {
-    height: SIZE,
-    width: SIZE * 2,
-    flexDirection: 'row',
-    alignItems: 'center',
-    overflow: 'hidden',
+    width: SIZE,
+    overflow: "hidden"
   },
-  qrContainer: {
+  animationContainer: {
+    width: SIZE * 2,
+    flexDirection: "row",
+  },
+  container: {
     height: SIZE,
     width: SIZE,
-    alignItems: 'center',
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  title: {
+    fontFamily: "ExtraBold",
+    color: "#000",
+    fontSize: 20
+  },
+  subtitle: {
+    fontFamily: "SemiBold",
+    textAlign: "center",
+    marginBottom: 16,
+    maxWidth: 200,
+    color: "#475569",
+  },
+  qrWrapper: {
+    height: 200,
+    width: 200,
+    padding: 8,
+    alignItems: "center",
+    justifyContent: "center",
+    borderRadius: 10,
+    shadowColor: "rgba(0, 0, 0, 0.5)",
+    shadowOpacity: 1,
+    shadowRadius: 1,
   },
   placeHolder: {
     height: SIZE - 30,
@@ -265,13 +284,9 @@ const styles = StyleSheet.create({
     backgroundColor: '#f3f3f3',
     borderRadius: 10,
   },
-  qrCode: {
-    height: SIZE,
-    width: SIZE,
-  },
   text: {
-    color: '#2C3639',
-    fontWeight: 'bold',
+    color: '#475569',
+    fontFamily: "SemiBold",
     fontSize: 15,
   },
   infoContainer: {
@@ -281,14 +296,14 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   picture: {
-    height: SIZE / 2,
-    width: SIZE / 2,
+    height: SIZE / 2.5,
+    width: SIZE / 2.5,
     borderRadius: SIZE / 4,
-    marginBottom: 20,
+    marginBottom: 16,
   },
   username: {
-    color: '#E94560',
-    fontWeight: 'bold',
+    color: '#ff5e5e',
+    fontFamily: "SemiBold",
     fontSize: 15,
     textTransform: 'capitalize',
   },

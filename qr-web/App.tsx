@@ -1,5 +1,5 @@
 import React, {useEffect} from 'react';
-import {Text} from 'react-native';
+import {Text, StyleSheet, View, ActivityIndicator} from 'react-native';
 import {NavigationContainer} from '@react-navigation/native';
 import {createStackNavigator} from '@react-navigation/stack';
 import {useSnapshot} from 'valtio';
@@ -8,11 +8,17 @@ import {Home} from './src/home';
 import {authState, setIsAuthenticated} from './src/utils/authStore';
 import {StackScreens} from './src/utils/types';
 import NotFound from './src/shared/NotFound';
+import {useFonts} from 'expo-font';
 
 const Stack = createStackNavigator<StackScreens>();
 
 export default function App() {
   const state = useSnapshot(authState);
+  const [fontsLoaded] = useFonts({
+    "ExtraBold": require("./assets/fonts/ExtraBold.ttf"),
+    "SemiBold": require("./assets/fonts/SemiBold.ttf"),
+    "Regular": require("./assets/fonts/Regular.ttf")
+  })
 
   useEffect(() => {
     const tokenString = localStorage.getItem('tokens')
@@ -21,13 +27,21 @@ export default function App() {
     }
   }, [])
 
+  if(!fontsLoaded) {
+    return (
+      <View style={styles.root}>
+        <ActivityIndicator color={""} size={"large"} />
+      </View>
+    )
+  }
+
   return (
     <NavigationContainer linking={{
       prefixes: [],
       config: {
         screens: {
+          Login: '/',
           Home: '/me',
-          Login: '/login',
           NotFound: "*"
         },
       }
@@ -43,3 +57,12 @@ export default function App() {
     </NavigationContainer>
   );
 }
+
+const styles = StyleSheet.create({
+  root: {
+    flex: 1,
+    backgroundColor: '#fff',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+});

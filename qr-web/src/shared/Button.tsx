@@ -59,31 +59,30 @@ const Button: React.FC<ButtonProps> = ({
 const styles = StyleSheet.create({
   button: {
     padding: 10,
-    justifyContent: 'center',
     alignItems: 'center',
+    justifyContent: 'center',
     borderRadius: 5,
     height: 40,
+    fontFamily: "ExtraBold"
   },
   acceptButton: {
     backgroundColor: '#3366ff',
   },
   declineButton: {
-    backgroundColor: '#fff',
-    borderWidth: 0.5,
-    borderColor: '#E94560',
+    backgroundColor: '#ff5e5e',
   },
   disabledButton: {
     backgroundColor: '#EDF1F7',
     borderWidth: 0,
   },
   text: {
-    fontWeight: 'bold',
+    fontFamily: 'ExtraBold',
   },
   acceptButtonText: {
     color: '#fff',
   },
   declineButtonText: {
-    color: '#E94560',
+    color: '#fff',
   },
   disabledButtonText: {
     color: '#c3c3c3',

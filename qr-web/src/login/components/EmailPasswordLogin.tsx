@@ -1,4 +1,4 @@
-import {View, Text, StyleSheet, TextInput, Alert, Image} from 'react-native';
+import {View, Text, StyleSheet, TextInput, Alert, Image, Pressable} from 'react-native';
 import React, {useState} from 'react';
 import {apiAuthLogin} from '../../utils/urls';
 import {SIZE} from '../../utils/contants';
@@ -6,6 +6,7 @@ import {setAccessToken, setIsAuthenticated} from '../../utils/authStore';
 import {axiosInstance} from '../../utils/axiosInstace';
 import Button from '../../shared/Button';
 import {AxiosError} from 'axios';
+import IonIcons from '@expo/vector-icons/Ionicons';
 
 type LoginErors = {
   email?: string;
@@ -16,6 +17,7 @@ const EmailPasswordLogin = () => {
   const [data, setData] = useState({email: '', password: ''});
   const [error, setError] = useState<LoginErors>({email: undefined, password: undefined});
 
+  const [isSecure, setIsSecure] = useState<boolean>(true);
   const [disable, setDisabled] = useState<boolean>(false);
   const [isInvalidCredentails, setIsInvalidCredentails] = useState(false);
 
@@ -47,9 +49,15 @@ const EmailPasswordLogin = () => {
 
   return (
     <View style={styles.root}>
-      <Image source={require('../../../assets/react.png')} style={styles.image} />
       <Text style={styles.title}>Login</Text>
-      <TextInput placeholder="Email" style={styles.input} onChangeText={(t) => onChangeText(t, 'email')} />
+
+      <Text style={styles.label}>Email Address</Text>
+      <TextInput 
+        placeholder="appuser@demo.com"
+        placeholderTextColor={"#475569"}
+        style={styles.input} 
+        onChangeText={(t) => onChangeText(t, 'email')} 
+      />
       {
         error.email ?
           (
@@ -57,12 +65,19 @@ const EmailPasswordLogin = () => {
           ) : null
       }
       
-      <TextInput
-        placeholder="password"
-        style={styles.input}
-        onChangeText={t => onChangeText(t, 'password')}
-        secureTextEntry={true}
-      />
+      <Text style={styles.label}>Password</Text>
+      <View style={styles.passwordInputContainer}>
+        <TextInput
+          placeholder="password"
+          placeholderTextColor={"#475569"}
+          style={styles.passwordInput}
+          onChangeText={t => onChangeText(t, 'password')}
+          secureTextEntry={isSecure}
+        />
+        <Pressable onPress={() => setIsSecure(s => !s)} style={styles.icon}>
+          <IonIcons name={isSecure ? 'eye' : 'eye-off'} color={"#475569"} size={20} />
+        </Pressable>
+      </View>
       {
         error.password ?
           (
@@ -86,26 +101,40 @@ const styles = StyleSheet.create({
     width: SIZE,
     justifyContent: 'center'
   },
-  image: {
-    width: 70,
-    height: 70,
+  title: {
+    color: '#000',
+    fontFamily: "ExtraBold",
+    fontSize: 20,
     marginBottom: 16,
-    alignSelf: 'center'
+  },
+  label: {
+    fontFamily: "SemiBold",
+    color: "#475569"
   },
   input: {
     width: SIZE,
-    height: 40,
+    height: 44,
     backgroundColor: '#f3f3f3',
     marginBottom: 16,
     marginVertical: 8,
     paddingHorizontal: 15,
-    alignSelf: 'flex-start'
+    alignSelf: 'flex-start',
+    fontFamily: "Regular"
   },
-  title: {
-    color: '#000',
-    fontWeight: 'bold',
-    fontSize: 18,
+  passwordInputContainer: {
+    height: 44,
+    width: SIZE,
+    flexDirection: "row",
+    backgroundColor: "#f3f3f3",
     marginBottom: 16,
+    marginVertical: 8,
+    paddingHorizontal: 15,
+  },
+  passwordInput: {
+    flex: 1,
+  },
+  icon: {
+    alignSelf: "center"
   },
   error: {
     color: '#E94560',
