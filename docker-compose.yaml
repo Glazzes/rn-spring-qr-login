@@ -14,3 +14,11 @@ services:
       - "8080:8080"
     depends_on:
       - redis
+
+  web:
+    image: glazee/qr-web:0.0.1
+    container_name: web
+    ports:
+      - "3000:80"
+    depends_on:
+      - web

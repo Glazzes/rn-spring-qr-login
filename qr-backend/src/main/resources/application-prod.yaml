@@ -7,7 +7,7 @@ web:
       cancel-login: cancel.login
     origins:
       - http://localhost:3000
-      - https://glazzes.github.io
+      - http://140.238.187.124
 
 spring:
   servlet:

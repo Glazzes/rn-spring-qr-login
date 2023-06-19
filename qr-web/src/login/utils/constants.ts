@@ -1,1 +1,0 @@
-export const COUNNTDOWN_SECONDS = 300;
